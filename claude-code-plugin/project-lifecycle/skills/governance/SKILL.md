@@ -37,6 +37,8 @@ metadata:
 
 어떤 Phase를 시작하든, **먼저 실행계획 문서를 작성**한다.
 
+실행계획서는 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 저장되며, 이 디렉토리는 세션을 가로질러 유지되어 **세션이 종료된 후에도 기록(문서)으로 디스크에 남는다**. 자세한 경로 규약은 본 문서 하단 "실행계획서 저장 위치" 섹션 참조.
+
 ### 실행계획서 구조
 
 `references/execution-plan-template.md`의 템플릿을 기반으로 작성:
@@ -194,7 +196,7 @@ metadata:
 **Phase 2 (기획) 진입 시:**
 ```
 1. [PLAN] "Phase 2 실행계획서를 작성합니다."
-   → docs/02-planning/execution-plan.md 생성
+   → .claude/local/plans/<branch>/02-planning/execution-plan.md 생성
    → "아이디어 브리프 기반으로 PRD, 유저 스토리, 스코프 문서를 작성합니다.
       In-Scope: Must/Should Have 기능 도출, MVP 범위 확정
       Out-of-Scope: 기술 스택 결정 (Phase 3에서)
@@ -217,18 +219,42 @@ metadata:
 
 ## 실행계획서 저장 위치
 
-각 Phase의 실행계획서는 해당 docs 디렉토리에 저장:
+실행계획서는 **브랜치별로 분리된 작업 영역** `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 저장된다. 이 영역은 산출물(`docs/`)과 분리된 "초안/작업 메모" 공간으로, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있다.
 
 ```
-docs/
-├── 01-ideation/execution-plan.md
-├── 02-planning/execution-plan.md
-├── 03-architecture/execution-plan.md
-├── 04-design/execution-plan.md
-├── 05-implementation/execution-plan.md
-├── 06-infra/execution-plan.md
-└── 07-qa/execution-plan.md
+<project-root>/
+├── .gitignore                       ← `.claude/local/` 한 줄 등록 (Phase 0 setup이 자동 처리)
+└── .claude/
+    └── local/                       ← gitignore 대상 래퍼 (이 한 폴더만 ignore)
+        └── plans/
+            ├── main/
+            │   └── 02-planning/execution-plan.md
+            └── claude-save-execution-plans-AaqnA/
+                ├── 01-ideation/execution-plan.md
+                ├── 02-planning/execution-plan.md
+                └── 05-implementation/execution-plan.md
 ```
+
+### 브랜치 이름 결정 절차
+
+PLAN 단계 진입 시 다음 절차로 `<branch>` 부분을 결정한다:
+
+1. `git branch --show-current`로 현재 브랜치 이름을 얻는다. (커밋이 없는 unborn 브랜치에서도 동작한다.) 사용 불가 환경이면 `git rev-parse --abbrev-ref HEAD`로 대체한다.
+2. 결과가 빈 문자열이거나 `HEAD`(detached)이거나 git 저장소가 아니면 `_no-branch`로 폴백한다.
+3. 슬래시(`/`)를 하이픈(`-`)으로 치환한다 (`tr '/' '-'`). 예: `claude/save-execution-plans-AaqnA` → `claude-save-execution-plans-AaqnA`.
+4. 결과를 `<branch>`에 사용한다.
+
+### gitignore 처리
+
+래퍼 폴더 `.claude/local/`을 프로젝트 `.gitignore`에 등록한다. 이로써 그 아래 `plans/`(및 추후 추가될 다른 비공개 작업 영역)가 일괄적으로 git 추적에서 제외된다.
+
+- 신규 프로젝트: Phase 0 (`00-setup`) 스킬이 초기 설정 시 `.gitignore`에 자동 추가한다.
+- 기존 프로젝트: 사용자가 수동으로 `.claude/local/` 한 줄을 `.gitignore`에 추가한다.
+
+### 같은 브랜치 내 재수립 / 수동 승격
+
+- 같은 브랜치+Phase에서 계획을 다시 수립할 때는 단일 파일을 덮어쓴다. `.claude/local/`은 git 추적 대상이 아니므로 이력 보존은 사용자 책임이다.
+- 합의가 끝난 계획을 영구 산출물로 남기고 싶다면, 사용자가 직접 해당 파일을 `docs/<NN-phase>/`로 이동/복사하여 **승격(promote)**한다. 자동 승격은 수행하지 않는다.
 
 ## 참고 자료
 

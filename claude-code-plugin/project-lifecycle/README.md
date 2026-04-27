@@ -47,6 +47,10 @@ Phase에 종속되지 않고 전체 라이프사이클에서 횡단적으로 호
 ```
 your-project/
 ├── CLAUDE.md                   ← 에이전트 컨텍스트 파일
+├── .claude/
+│   └── local/                  ← gitignore 대상 작업 영역 (브랜치별 실행계획 등)
+│       └── plans/
+│           └── <branch>/<NN-phase>/execution-plan.md
 └── docs/
     ├── lifecycle.md            ← ALM 추적 정보
     ├── tech-debt-registry.md   ← 기술 부채 기록부
@@ -100,7 +104,7 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
                                                               PLAN으로 복귀
 ```
 
-각 Phase 진입 시 `execution-plan.md`가 해당 Phase의 docs 디렉토리에 생성되며, 목표, 범위, 실행 단계, 성공 기준, 재검증 기준이 명시됩니다.
+각 Phase 진입 시 `execution-plan.md`는 **브랜치별 작업 영역**인 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 생성됩니다 (목표, 범위, 실행 단계, 성공 기준, 재검증 기준 명시). 이 영역은 `.gitignore` 처리되어 git 추적에서 제외되며, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있습니다. 합의된 계획을 영구 산출물로 보존하려면 사용자가 직접 `docs/<NN-phase>/`로 이동/복사하여 승격(promote)합니다. 자세한 규약은 `governance` 스킬 문서를 참조하세요.
 
 ## 사용 방법
 

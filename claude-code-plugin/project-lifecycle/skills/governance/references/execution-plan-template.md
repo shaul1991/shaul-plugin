@@ -1,6 +1,8 @@
 # [Phase N: 단계명] 실행계획서
 
 > **상태**: Draft → Under Review → Approved → In Progress → Re-verifying → Completed
+> **브랜치**: `<git branch --show-current 결과 (없으면 _no-branch)>`
+> **저장 경로**: `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`
 > **작성일**: YYYY-MM-DD
 > **승인일**: (검증 후 기입)
 
