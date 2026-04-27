@@ -39,6 +39,19 @@ metadata:
 
 실행계획서는 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 저장되며, 이 디렉토리는 세션을 가로질러 유지되어 **세션이 종료된 후에도 기록(문서)으로 디스크에 남는다**. 자세한 경로 규약은 본 문서 하단 "실행계획서 저장 위치" 섹션 참조.
 
+### PLAN 사전 준비 (모든 Phase 공통, 매 PLAN 진입 시 수행)
+
+실행계획서 파일을 쓰기 **전에** 아래 항목을 보장한다. 사용자가 Phase 0(`00-setup`)을 건너뛰고 다른 Phase부터 시작했더라도, 어떤 Phase의 PLAN이든 이 절차를 자체적으로 수행해 환경을 정합 상태로 만든다.
+
+1. 프로젝트 루트의 `.gitignore`에 `.claude/local/` 줄이 있는지 확인한다.
+   - 없으면 한 줄 추가한다 (`.gitignore`가 없으면 새로 만든다).
+   - 동일 의미의 패턴(`.claude/local`, `.claude/local/*` 등)이 이미 있으면 중복 추가하지 않는다.
+2. "브랜치 이름 결정 절차"(아래 "실행계획서 저장 위치" 섹션 참조)에 따라 `<branch>`를 산출한다.
+3. `.claude/local/plans/<branch>/<NN-phase>/` 디렉토리를 생성한다 (없을 경우).
+4. 위 디렉토리에 `execution-plan.md`를 작성한다.
+
+이 절차는 플러그인이 **사용자 프로젝트에 설치되어 사용될 때**에도 동일하게 적용된다 — 어느 Phase가 먼저 호출되든 작업 영역과 gitignore 보호가 자동으로 정합화된다.
+
 ### 실행계획서 구조
 
 `references/execution-plan-template.md`의 템플릿을 기반으로 작성:
