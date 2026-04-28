@@ -98,6 +98,45 @@ metadata:
 
 상세 절차는 `claude-code-plugin/project-lifecycle/skills/knowledge/SKILL.md` 와 헌장 `docs/direction/2026-04-28-three-doc-set-charter.md` 참조.
 
+### Step 7: 시크릿 파일 가드 정책 리뷰 (v0.7.0+, 보안 의식 형성)
+
+> Phase 0 의 보안 의식 형성 단계. 가드 자체는 *플러그인 설치만으로 이미 활성*(PreToolUse 훅) 이지만, 사용자가 *지금 한 번 명시적으로 확인*하는 게 초기 보안 사고 방지의 가장 큰 효과를 낸다. 헌장 D3·`secret-file-guardrail-charter` 참조.
+
+#### 7-1. 가드 활성 사실 안내
+
+사용자에게 다음을 *반드시 한 번* 알린다:
+
+> "본 플러그인은 `Read`/`Edit`/`Write`/`Bash` 도구가 `.env`, `.env.*` 등 시크릿 파일을 만지려 시도하면 *무조건* 차단합니다. 어느 step·skill·에이전트에서 호출되든 동일하게 적용됩니다(skill 별 우회 경로 없음). `.env.example`/`.sample`/`.template`/`.dist` 같은 템플릿은 통과합니다.
+>
+> 정책은 별도 등록 없이도 *내장 기본값* 으로 즉시 활성됩니다. 일시 해제는 `CLAUDE_PLUGIN_SECRET_GUARD=off` env var 한 가지뿐이며, 우회 시 stderr 에 알림이 출력됩니다."
+
+#### 7-2. 정책 커스터마이즈 의향 확인
+
+사용자에게 묻는다 — *지금 이 순간* 추가로 보호하고 싶은 파일이 있는가?
+
+> "기본값 외에 다음과 같은 파일도 *지금* 정책에 추가할까요? (선택 사항):
+> - 항상 차단할 파일(`always_block`) — 추가 후 차단 즉시 적용
+> - 읽기 전 사용자 확인이 필요한 파일(`ask_before_read`) — 추가 후 도구 호출 시 인라인 프롬프트
+>
+> 흔한 후보:
+> - SSH 키: `id_rsa`, `id_rsa.*`, `id_ed25519`, `id_ed25519.*`
+> - 인증서·키: `*.pem`, `*.key`, `*.p12`, `*.pfx`
+> - 클라우드 자격 증명: `.aws/credentials`, `.gcloud/credentials*.json`, `gcp-key*.json`
+> - 패키지 매니저 토큰: `.npmrc`, `.netrc`, `.yarnrc`
+>
+> 추가하고 싶으면 어느 카테고리에 어떤 패턴을 넣을지 알려주세요. 추가하지 않으면 *내장 기본값으로* 진행합니다."
+
+#### 7-3. 정책 파일 작성 분기
+
+- **사용자가 추가 항목 제시** → `claude-code-plugin/project-lifecycle/hooks/secret-guard-template.json` 을 시작점으로 삼아 `.claude/secret-guard.json` 을 작성한다. 사용자가 명시한 항목만 반영(추측 X). `$examples` 블록은 제거. 작성 후 사용자에게 결과 표를 보여주고 *명시적 확인* 을 받는다.
+- **사용자가 추가 안 함** → `.claude/secret-guard.json` 을 *만들지 않는다*. 내장 기본값이 그대로 적용된다(헌장 D3). 사용자에게 한 줄 안내: "필요해지면 언제든 `.claude/secret-guard.json` 을 직접 생성·편집해서 정책을 추가할 수 있습니다."
+
+#### 7-4. 우회 메커니즘 인식 강화
+
+세팅 종료 직전 한 줄 더:
+
+> "정당한 사유로 일시 해제가 필요할 때만 `CLAUDE_PLUGIN_SECRET_GUARD=off claude` 로 세션을 시작하세요. 세션 종료 시 자동 복원되며, 우회 사실은 stderr 로 매 호출마다 알려지므로 추적 가능합니다."
+
 > 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
 ## 가이드라인
@@ -112,3 +151,5 @@ metadata:
 
 - **`references/project-config-template.md`** — 프로젝트 설정 템플릿
 - **`references/team-conventions-template.md`** — 팀 컨벤션 정의 템플릿
+- **`../../hooks/secret-guard-template.json`** — Step 7-3 의 정책 작성 시작 샘플
+- **`../../../../docs/direction/2026-04-28-secret-file-guardrail-charter.md`** — Step 7 의 상위 헌장

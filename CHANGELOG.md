@@ -33,6 +33,16 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 - 본 가드는 `permissions.deny` settings.json 을 ship 하지 *않는다*. 사용자
   `settings.local.json` 우선순위가 plugin settings 보다 높아 *무조건 적용* 보장이
   깨지기 때문(헌장 D12). 훅으로 일원화.
+- **`00-setup` SKILL Step 7 신설 — 시크릿 파일 가드 정책 리뷰**. Phase 0 종료
+  전에 사용자에게 (1) 가드 활성 사실, (2) 정책 커스터마이즈 의향, (3) 일시 해제
+  메커니즘(`CLAUDE_PLUGIN_SECRET_GUARD=off`) 을 *명시적으로 한 번* 안내한다.
+  사용자가 추가 항목 제시 시에만 `.claude/secret-guard.json` 을 작성(추측·자동
+  채굴 X). 가드 자체는 플러그인 설치만으로 이미 동작 중이지만, *사용자가 인지하는
+  보안* 만이 실제 보안이라는 원칙에 따라 초기 셋업 단계에 보안 의식 형성을
+  자연스럽게 통합.
+- `setup-coordinator` 에이전트 — 행동 원칙 5(보안 의식 형성은 *지금*) 및
+  전문 영역에 시크릿 파일 가드 정책 리뷰 추가. "사용자가 명시하지 않은 파일은
+  추가하지 않는다" 가드레일 명시.
 
 ### Migration (v0.6.x → v0.7.0)
 별도 작업 불필요. 머지 후 다음 세션부터 `PreToolUse` 가 자동 발효된다.
