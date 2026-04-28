@@ -24,6 +24,22 @@
 | ESLint / Ruff | 린터 | `.eslintrc` / `ruff.toml` |
 | TypeScript | 타입 체크 | `tsconfig.json` |
 
+### `.editorconfig` (선택, 사용자 직접 생성)
+
+플러그인은 `.editorconfig`를 자동 생성하지 않는다. 이 파일은 에디터가 프로젝트 루트에서 직접 읽어야 의미가 있어 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 다음 스니펫을 참고해 직접 프로젝트 루트에 `.editorconfig`를 생성한다:
+
+```ini
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+```
+
 ---
 
 ## 2. 네이밍 규칙

@@ -96,7 +96,7 @@ ALM의 진정한 완성은 '종료'가 아니라 '지속적인 개선'에 있다
 ### Step 4: 기술 부채 리뷰
 Phase 3에서 시작된 기술 부채 기록부를 정기적으로 리뷰:
 
-1. **기술 부채 현황 점검** — `docs/tech-debt-registry.md` 리뷰
+1. **기술 부채 현황 점검** — `.claude/tech-debt-registry.md` 리뷰
 2. **신규 부채 등록** — 운영 중 발견된 새로운 기술 부채 추가
 3. **부채 상환 우선순위** — 비즈니스 임팩트 기준으로 정렬
 4. **상환 계획** — 다음 스프린트에 상환할 부채 선정 (전체 작업의 10-20%)
@@ -126,11 +126,11 @@ Phase 3에서 시작된 기술 부채 기록부를 정기적으로 리뷰:
 5. **재발 방지** — 구체적 예방 조치 (담당자, 기한 포함)
 
 ### Step 7: 산출물 생성
-- **`docs/08-maintenance/monitoring-report.md`** — 모니터링 현황 보고서
-- **`docs/08-maintenance/feedback-analysis.md`** — 피드백 분석 결과
-- **`docs/08-maintenance/retrospective.md`** — 회고 기록
-- **`docs/08-maintenance/incident-reports/`** — 인시던트 포스트모템 (발생 시)
-- **`docs/tech-debt-registry.md`** 업데이트 — 기술 부채 현황 갱신
+- **`.claude/08-maintenance/monitoring-report.md`** — 모니터링 현황 보고서
+- **`.claude/08-maintenance/feedback-analysis.md`** — 피드백 분석 결과
+- **`.claude/08-maintenance/retrospective.md`** — 회고 기록
+- **`.claude/08-maintenance/incident-reports/`** — 인시던트 포스트모템 (발생 시)
+- **`.claude/tech-debt-registry.md`** 업데이트 — 기술 부채 현황 갱신
 
 ## 가이드라인
 

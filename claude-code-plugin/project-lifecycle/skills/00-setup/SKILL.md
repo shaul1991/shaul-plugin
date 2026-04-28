@@ -59,32 +59,36 @@ metadata:
 ### Step 3: 프로젝트 구성 파일 생성
 에이전트가 참조할 프로젝트 구성 파일을 생성한다:
 
-1. **`CLAUDE.md`** — 에이전트에게 프로젝트 컨텍스트를 전달하는 핵심 파일
+1. **`.claude/CLAUDE.md`** — 에이전트에게 프로젝트 컨텍스트를 전달하는 핵심 파일
    - 프로젝트 개요, 기술 스택, 디렉토리 구조, 코딩 컨벤션 요약
-2. **`.editorconfig`** — 에디터 공통 설정 (들여쓰기, 줄바꿈 등)
-3. **`.gitignore`** — 버전 관리 제외 파일 목록
-   - 다음 한 줄을 반드시 포함시킨다 (실행계획서 작업 영역 보호):
+   - 루트가 아닌 `.claude/CLAUDE.md`에 둔다 — Claude Code가 양쪽 모두 프로젝트 메모리로 자동 로드하므로 동작상 차이가 없으며, 프로젝트 루트는 깨끗하게 유지된다.
+2. **`.gitignore`** — 버전 관리 제외 파일 목록
+   - 다음 한 줄을 반드시 포함시킨다 (플러그인 산출물 전체 보호):
      ```
-     .claude/local/
+     .claude/
      ```
-   - 이미 동일 경로(또는 `.claude/local`/`.claude/local/*`)가 등록되어 있으면 중복 추가하지 않는다.
+   - 이미 동일 경로(또는 `.claude`, `.claude/*`)가 등록되어 있으면 중복 추가하지 않는다.
+   - 레거시 `.claude/local/`만 있으면 `.claude/`로 교체한다 (SessionStart 훅과 동일한 동작).
    - `.gitignore` 파일이 없으면 새로 만든다.
-4. **`docs/` 디렉토리 초기화** — lifecycle.md 생성
+   - 이 한 줄로 플러그인이 생성하는 모든 산출물이 git 추적에서 제외된다. 특정 산출물(예: PRD)을 팀과 공유하고 싶다면, 해당 파일을 사용자가 `.claude/` 밖(예: `docs/02-planning/prd.md`)으로 직접 이동시킨다. `git add -f` 같은 우회는 권장하지 않는다.
+3. **`.claude/` 디렉토리 산출물 작성** — ALM 추적 파일과 단계 산출물을 모두 `.claude/` 하위에 생성한다.
 
 ### Step 4: ALM 추적 파일 초기화
 프로젝트 수명주기 추적을 위한 기본 파일을 생성한다:
 
-1. **`docs/lifecycle.md`** — Phase별 진행 이력, 게이트 판정, 변경 이력
-2. **`docs/tech-debt-registry.md`** — 기술 부채 기록부 초기화
-3. **`docs/kpi-definitions.md`** — 성공 지표 정의 문서 초기화
+1. **`.claude/lifecycle.md`** — Phase별 진행 이력, 게이트 판정, 변경 이력
+2. **`.claude/tech-debt-registry.md`** — 기술 부채 기록부 초기화
+3. **`.claude/kpi-definitions.md`** — 성공 지표 정의 문서 초기화
 
 ### Step 5: 산출물 생성
-- **`docs/00-setup/project-config.md`** — 프로젝트 메타데이터 및 컨벤션
-- **`docs/00-setup/team-conventions.md`** — 팀 컨벤션 상세
-- **`CLAUDE.md`** — 프로젝트 루트의 에이전트 컨텍스트 파일
-- **`docs/lifecycle.md`** — ALM 추적 파일
-- **`docs/tech-debt-registry.md`** — 기술 부채 기록부
-- **`docs/kpi-definitions.md`** — 성공 지표 정의서
+- **`.claude/00-setup/project-config.md`** — 프로젝트 메타데이터 및 컨벤션
+- **`.claude/00-setup/team-conventions.md`** — 팀 컨벤션 상세
+- **`.claude/CLAUDE.md`** — 에이전트 컨텍스트 파일
+- **`.claude/lifecycle.md`** — ALM 추적 파일
+- **`.claude/tech-debt-registry.md`** — 기술 부채 기록부
+- **`.claude/kpi-definitions.md`** — 성공 지표 정의서
+
+> 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
 ## 가이드라인
 

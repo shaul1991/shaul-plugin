@@ -44,15 +44,17 @@ metadata:
 플러그인이 설치된 사용자 프로젝트에서는 **SessionStart 훅**(`hooks/bootstrap-local.sh`)이 세션 시작 시 자동으로 다음을 보장한다:
 
 - 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성
-- 프로젝트 `.gitignore`에 `.claude/local/` 한 줄 추가 (없으면 새로 만들고, 기존 내용은 보존)
+- 프로젝트 `.gitignore`에 `.claude/` 한 줄 추가 (없으면 새로 만들고, 기존 내용은 보존)
+- 레거시 `.claude/local/` 라인이 있으면 자동으로 `.claude/`로 교체 (v0.3.x → v0.4.0 업그레이드 보조)
 - 이미 적용된 프로젝트에서는 아무 동작도 하지 않는다 (idempotent)
 - 사용자의 cwd가 git 저장소가 아니면 동작하지 않는다 (보수적 가드)
 
 훅이 실행되지 못한 환경(예: 훅을 비활성화한 사용자, 플러그인 외부 호출)을 대비하여, **모든 Phase의 PLAN 단계는 실행계획서 파일을 쓰기 전에** 동일한 보장을 자체적으로 수행한다:
 
-1. 프로젝트 루트의 `.gitignore`에 `.claude/local/` 줄이 있는지 확인한다.
+1. 프로젝트 루트의 `.gitignore`에 `.claude/` 줄이 있는지 확인한다.
    - 없으면 한 줄 추가한다 (`.gitignore`가 없으면 새로 만든다).
-   - 동일 의미의 패턴(`.claude/local`, `.claude/local/*` 등)이 이미 있으면 중복 추가하지 않는다.
+   - 동일 의미의 패턴(`.claude`, `.claude/*` 등)이 이미 있으면 중복 추가하지 않는다.
+   - 레거시 `.claude/local/`만 있는 경우 `.claude/`로 교체한다 (훅과 동일).
 2. "브랜치 이름 결정 절차"(아래 "실행계획서 저장 위치" 섹션 참조)에 따라 `<branch>`를 산출한다.
 3. `.claude/local/plans/<branch>/<NN-phase>/` 디렉토리를 생성한다 (없을 경우).
 4. 위 디렉토리에 `execution-plan.md`를 작성한다.
@@ -198,7 +200,7 @@ metadata:
 
 ### 재검증 판정
 
-- **통과 (Pass)** → `docs/lifecycle.md`에 이력 기록 후 다음 Phase 진행 가능
+- **통과 (Pass)** → `.claude/lifecycle.md`에 이력 기록 후 다음 Phase 진행 가능
 - **조건부 통과 (Conditional Pass)** → 경미한 보완 후 통과 처리 (보완 사항 명시)
 - **미달 (Fail)** → 보완 실행 (Stage 3 부분 재실행) 또는 근본적 문제 시 Stage 1로 복귀
 
@@ -206,7 +208,7 @@ metadata:
 
 1. 실행계획서의 성공 기준 체크리스트를 채운다
 2. 산출물 목록과 저장 경로를 보고한다
-3. 교훈 및 개선 사항을 `docs/lifecycle.md`에 기록한다
+3. 교훈 및 개선 사항을 `.claude/lifecycle.md`에 기록한다
 4. 다음 Phase 진행 가능 여부를 명시한다
 
 ---
@@ -239,13 +241,18 @@ metadata:
 
 ## 실행계획서 저장 위치
 
-실행계획서는 **브랜치별로 분리된 작업 영역** `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 저장된다. 이 영역은 산출물(`docs/`)과 분리된 "초안/작업 메모" 공간으로, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있다.
+실행계획서는 **브랜치별로 분리된 작업 영역** `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 저장된다. 이 영역은 단계별 산출물(`.claude/<NN-phase>/`)과 분리된 "초안/작업 메모" 공간으로, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있다. `.claude/` 폴더 전체가 gitignore되므로 실행계획서·산출물 모두 기본적으로 git 추적에서 제외된다.
 
 ```
 <project-root>/
-├── .gitignore                       ← `.claude/local/` 한 줄 등록 (Phase 0 setup이 자동 처리)
-└── .claude/
-    └── local/                       ← gitignore 대상 래퍼 (이 한 폴더만 ignore)
+├── .gitignore                       ← `.claude/` 한 줄 등록 (Phase 0 setup이 자동 처리)
+└── .claude/                         ← 폴더 전체 ignore (기본값)
+    ├── CLAUDE.md                    ← 에이전트 컨텍스트
+    ├── lifecycle.md                 ← ALM 추적 이력
+    ├── tech-debt-registry.md
+    ├── kpi-definitions.md
+    ├── 00-setup/, 01-ideation/, ..., 08-maintenance/   ← 단계별 산출물
+    └── local/                       ← 작업영역 (실행계획서)
         └── plans/
             ├── main/
             │   └── 02-planning/execution-plan.md
@@ -266,15 +273,19 @@ PLAN 단계 진입 시 다음 절차로 `<branch>` 부분을 결정한다:
 
 ### gitignore 처리
 
-래퍼 폴더 `.claude/local/`을 프로젝트 `.gitignore`에 등록한다. 이로써 그 아래 `plans/`(및 추후 추가될 다른 비공개 작업 영역)가 일괄적으로 git 추적에서 제외된다.
+`.claude/` 폴더 전체를 프로젝트 `.gitignore`에 등록한다. 이로써 플러그인이 만드는 모든 산출물(단계 폴더, 실행계획서, ALM 추적 파일, 에이전트 컨텍스트)이 일괄적으로 git 추적에서 제외된다.
 
-- 신규 프로젝트: Phase 0 (`00-setup`) 스킬이 초기 설정 시 `.gitignore`에 자동 추가한다.
-- 기존 프로젝트: 사용자가 수동으로 `.claude/local/` 한 줄을 `.gitignore`에 추가한다.
+- 신규 프로젝트: Phase 0 (`00-setup`) 스킬과 SessionStart 훅이 초기 설정 시 `.gitignore`에 자동 추가한다.
+- 기존 프로젝트(v0.3.x 이전): SessionStart 훅이 레거시 `.claude/local/` 라인을 자동으로 `.claude/`로 교체한다. 수동 작업 불필요.
+
+### 왜 `.claude/` 전체를 ignore 하는가
+
+플러그인이 만드는 모든 파일은 기본적으로 **사용자의 비공개 작업물**로 본다. 추적 여부는 전적으로 사용자의 결정이다. 팀과 공유하고 싶은 산출물이 생기면, 사용자가 해당 파일을 `.claude/` 밖(예: `docs/`)으로 직접 이동시키면 된다 — 이동된 파일은 자연스럽게 git 추적 대상이 된다. 이 방식은 (a) 프로젝트 저장소를 깨끗하게 유지하고, (b) Codex·Gemini 같은 다른 AI 도구가 추가되어도 각자 자기 폴더에 가둘 수 있으므로 도구 비종속성이 확보된다.
 
 ### 같은 브랜치 내 재수립 / 수동 승격
 
 - 같은 브랜치+Phase에서 계획을 다시 수립할 때는 단일 파일을 덮어쓴다. `.claude/local/`은 git 추적 대상이 아니므로 이력 보존은 사용자 책임이다.
-- 합의가 끝난 계획을 영구 산출물로 남기고 싶다면, 사용자가 직접 해당 파일을 `docs/<NN-phase>/`로 이동/복사하여 **승격(promote)**한다. 자동 승격은 수행하지 않는다.
+- 합의가 끝난 계획을 영구 산출물로 보존하려면 (a) 실행계획서를 `.claude/<NN-phase>/`로 이동/복사하고, (b) 그 산출물을 팀과 공유하여 git 추적이 필요하면 사용자가 직접 `.claude/` 밖(예: `docs/<NN-phase>/`)으로 이동시킨다. 추적 여부는 전적으로 사용자 결정이며, 자동 승격은 수행하지 않는다.
 
 ## 참고 자료
 

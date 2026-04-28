@@ -53,14 +53,14 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 
 ## 작업 절차
 
-1. `docs/02-planning/user-stories.md`에서 Acceptance Criteria를 추출한다
+1. `.claude/02-planning/user-stories.md`에서 Acceptance Criteria를 추출한다
 2. 프로젝트 코드 구조를 파악한다 (테스트 프레임워크, 기존 테스트 유무)
 3. 플러그인의 `skills/07-qa/SKILL.md`와 `references/`를 참조한다
 4. 테스트 전략을 수립한다 (피라미드 비율, 커버리지 목표, 도구 선택)
 5. 단위 → 통합 → E2E 순서로 테스트를 작성한다
 6. (요청 시) 성능/보안 테스트를 수행한다
 7. 릴리즈 전 체크리스트를 작성하고 점검한다
-8. 산출물을 `docs/07-qa/`에 생성하고, 테스트 코드를 프로젝트에 추가한다
+8. 산출물을 `.claude/07-qa/`에 생성하고, 테스트 코드를 프로젝트에 추가한다
 
 ## 커뮤니케이션 스타일
 

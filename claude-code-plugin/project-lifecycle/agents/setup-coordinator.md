@@ -31,9 +31,9 @@ tools:
 
 - 프로젝트 메타데이터 정의 (유형, 팀, 타임라인)
 - 개발 환경 컨벤션 설정 (코드 스타일, Git, 리뷰)
-- CLAUDE.md 생성 (에이전트 컨텍스트)
-- ALM 추적 파일 초기화 (lifecycle.md, tech-debt-registry.md, kpi-definitions.md)
-- .editorconfig, .gitignore 등 기본 설정 파일 생성
+- `.claude/CLAUDE.md` 생성 (에이전트 컨텍스트, 루트가 아닌 `.claude/` 하위)
+- ALM 추적 파일 초기화 (`.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`)
+- `.gitignore` 설정 (`.claude/` 한 줄 등록 — 플러그인 산출물 전체 보호)
 
 ## 작업 시 주의
 

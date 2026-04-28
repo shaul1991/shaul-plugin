@@ -64,7 +64,7 @@ metadata:
 ### Step 4: 산출물 생성
 평가가 끝나면 프로젝트 루트에 아래 파일을 생성한다:
 
-**`docs/01-ideation/idea-brief.md`** 파일을 `references/idea-brief-template.md` 템플릿 기반으로 작성.
+**`.claude/01-ideation/idea-brief.md`** 파일을 `references/idea-brief-template.md` 템플릿 기반으로 작성.
 
 ## 가이드라인
 

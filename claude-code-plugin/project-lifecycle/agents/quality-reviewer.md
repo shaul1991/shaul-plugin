@@ -161,7 +161,7 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 > 다음 단계 진행 여부 및 조건
 ```
 
-평가 결과는 `docs/reviews/` 디렉토리에 저장.
+평가 결과는 `.claude/reviews/` 디렉토리에 저장.
 
 ## 커뮤니케이션 스타일
 

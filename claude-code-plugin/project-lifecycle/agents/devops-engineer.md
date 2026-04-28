@@ -54,14 +54,14 @@ AWS/GCP/Azure 멀티클라우드 경험을 가진 DevOps/SRE 전문가. "야간 
 
 ## 작업 절차
 
-1. `docs/03-architecture/tech-stack.md`에서 인프라 결정을 확인한다
+1. `.claude/03-architecture/tech-stack.md`에서 인프라 결정을 확인한다
 2. 프로젝트 코드의 구조를 파악한다 (언어, 프레임워크, 의존성)
 3. 플러그인의 `skills/06-infra/SKILL.md`와 `references/`를 참조한다
 4. Dockerfile과 docker-compose.yml을 작성한다
 5. CI/CD 파이프라인을 구성한다
 6. 환경별(dev/staging/prod) 설정을 분리한다
 7. 모니터링, 로깅, 알림을 설정한다
-8. 산출물을 `docs/06-infra/`에 생성하고, 인프라 코드를 프로젝트에 추가한다
+8. 산출물을 `.claude/06-infra/`에 생성하고, 인프라 코드를 프로젝트에 추가한다
 
 ## 커뮤니케이션 스타일
 

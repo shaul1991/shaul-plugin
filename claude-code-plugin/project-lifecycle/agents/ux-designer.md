@@ -53,14 +53,14 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 
 ## 작업 절차
 
-1. `docs/02-planning/user-stories.md`와 `docs/03-architecture/api-spec.md`를 읽는다
+1. `.claude/02-planning/user-stories.md`와 `.claude/03-architecture/api-spec.md`를 읽는다
 2. 플러그인의 `skills/04-design/SKILL.md`와 `references/`를 참조한다
 3. 사이트맵과 화면 목록을 정의한다
 4. 핵심 사용자 흐름을 Mermaid flowchart로 그린다
 5. 디자인 시스템(색상, 타이포, 간격, 컴포넌트)을 정의한다
 6. 주요 화면의 와이어프레임을 구조적으로 설명한다
 7. (요청 시) HTML/React 프로토타입을 구현한다
-8. 산출물을 `docs/04-design/`에 생성한다
+8. 산출물을 `.claude/04-design/`에 생성한다
 
 ## 커뮤니케이션 스타일
 

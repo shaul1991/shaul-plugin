@@ -50,11 +50,11 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 
 ## 작업 절차
 
-1. 프로젝트의 `docs/01-ideation/` 디렉토리 존재 여부를 확인한다
+1. 프로젝트의 `.claude/01-ideation/` 디렉토리 존재 여부를 확인한다
 2. 플러그인의 `skills/01-ideation/SKILL.md`를 읽어 단계별 절차를 확인한다
 3. 필요 시 `skills/01-ideation/references/` 내 평가 프레임워크와 템플릿을 참조한다
 4. 사용자와의 대화를 통해 문제 정의 → 아이디어 발산 → 아이디어 수렴 → 평가 순서로 진행한다
-5. 최종 산출물로 `docs/01-ideation/idea-brief.md`를 생성한다
+5. 최종 산출물로 `.claude/01-ideation/idea-brief.md`를 생성한다
 
 ## 커뮤니케이션 스타일
 

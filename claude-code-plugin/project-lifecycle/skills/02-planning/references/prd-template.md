@@ -12,7 +12,7 @@
 > 작성자:  | 날짜: YYYY-MM-DD | 버전: 0.1
 
 ### 관련 문서
-- 아이디어 브리프: `docs/01-ideation/idea-brief.md`
+- 아이디어 브리프: `.claude/01-ideation/idea-brief.md`
 
 ---
 

@@ -42,16 +42,14 @@ Phase에 종속되지 않고 전체 라이프사이클에서 횡단적으로 호
 
 ## 산출물 구조
 
-각 단계를 진행하면 프로젝트의 `docs/` 디렉토리에 산출물이 생성됩니다:
+플러그인이 만드는 모든 산출물은 프로젝트의 **`.claude/` 폴더 안**에만 생성되며, `.claude/` 전체가 기본적으로 `.gitignore` 처리됩니다. 프로젝트 루트와 `docs/`는 사용자의 영역으로 그대로 비어 있습니다.
 
 ```
 your-project/
-├── CLAUDE.md                   ← 에이전트 컨텍스트 파일
-├── .claude/
-│   └── local/                  ← gitignore 대상 작업 영역 (브랜치별 실행계획 등)
-│       └── plans/
-│           └── <branch>/<NN-phase>/execution-plan.md
-└── docs/
+├── .gitignore                  ← `.claude/` 한 줄 자동 등록
+├── docs/                       ← 사용자 영역 (플러그인 미관여)
+└── .claude/                    ← 폴더 전체 ignore (기본값)
+    ├── CLAUDE.md               ← 에이전트 컨텍스트 (Claude Code가 자동 로드)
     ├── lifecycle.md            ← ALM 추적 정보
     ├── tech-debt-registry.md   ← 기술 부채 기록부
     ├── kpi-definitions.md      ← 성공 지표 정의서
@@ -86,12 +84,53 @@ your-project/
     ├── 07-qa/
     │   ├── test-strategy.md
     │   └── release-checklist.md
-    └── 08-maintenance/
-        ├── monitoring-report.md
-        ├── feedback-analysis.md
-        ├── retrospective.md
-        └── incident-reports/
+    ├── 08-maintenance/
+    │   ├── monitoring-report.md
+    │   ├── feedback-analysis.md
+    │   ├── retrospective.md
+    │   └── incident-reports/
+    └── local/                  ← 브랜치별 실행계획 작업 영역
+        └── plans/
+            └── <branch>/<NN-phase>/execution-plan.md
 ```
+
+### 산출물 공유 (사용자 결정에 의한 추적)
+
+`.claude/` 전체가 ignore되므로 플러그인 산출물은 기본적으로 git에 포함되지 않습니다. 팀과 공유하고 싶은 산출물(예: PRD, 유저 스토리)이 생기면 **사용자가 해당 파일을 `.claude/` 밖으로 직접 이동**시키면 됩니다 — 이동된 파일은 자연스럽게 git 추적 대상이 됩니다.
+
+```bash
+# 예: PRD를 docs/로 옮겨 팀과 공유하기
+mkdir -p docs/02-planning
+git mv .claude/02-planning/prd.md docs/02-planning/prd.md
+```
+
+`git add -f`나 `!.claude/...` un-ignore 패턴도 가능하지만, 플러그인 권장 방식은 단순 이동입니다. 추적 여부는 전적으로 사용자 결정입니다.
+
+### v0.3.x → v0.4.0 마이그레이션
+
+기존 사용자는 다음을 한 번 수행하면 v0.4.0 레이아웃으로 이전할 수 있습니다:
+
+```bash
+# 1. .claude/ 폴더 준비
+mkdir -p .claude
+
+# 2. docs/ 산출물을 .claude/로 이동
+for d in 00-setup 01-ideation 02-planning 03-architecture 04-design \
+         05-implementation 06-infra 07-qa 08-maintenance; do
+  [ -d "docs/$d" ] && git mv "docs/$d" ".claude/$d"
+done
+git mv docs/lifecycle.md docs/tech-debt-registry.md docs/kpi-definitions.md .claude/ 2>/dev/null || true
+
+# 3. 루트의 CLAUDE.md를 .claude/로 이동
+[ -f CLAUDE.md ] && git mv CLAUDE.md .claude/CLAUDE.md
+
+# 4. .gitignore의 .claude/local/ 라인은 SessionStart 훅이 자동으로 .claude/로 교체합니다 (수동 작업 불필요)
+
+# 5. 추적이 필요한 산출물(예: PRD)은 다시 .claude/ 밖으로 꺼내면 됩니다
+#    git mv .claude/02-planning/prd.md docs/02-planning/prd.md
+```
+
+`.editorconfig` 자동 생성은 v0.4.0에서 제거되었습니다. 필요하면 `references/team-conventions-template.md`의 샘플 스니펫을 참고해 직접 루트에 만드세요.
 
 ## 핵심 원칙: Plan → Review → Execute → Re-verify
 
@@ -104,16 +143,17 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
                                                               PLAN으로 복귀
 ```
 
-각 Phase 진입 시 `execution-plan.md`는 **브랜치별 작업 영역**인 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 생성됩니다 (목표, 범위, 실행 단계, 성공 기준, 재검증 기준 명시). 이 영역은 `.gitignore` 처리되어 git 추적에서 제외되며, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있습니다. 합의된 계획을 영구 산출물로 보존하려면 사용자가 직접 `docs/<NN-phase>/`로 이동/복사하여 승격(promote)합니다. 자세한 규약은 `governance` 스킬 문서를 참조하세요.
+각 Phase 진입 시 `execution-plan.md`는 **브랜치별 작업 영역**인 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 생성됩니다 (목표, 범위, 실행 단계, 성공 기준, 재검증 기준 명시). 이 영역은 `.claude/` 폴더 전체 ignore의 일부로 git 추적에서 제외되며, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있습니다. 합의된 계획을 영구 산출물로 보존하려면 사용자가 직접 `.claude/<NN-phase>/`로 이동시키고, 팀 공유가 필요하면 그 산출물을 `.claude/` 밖(예: `docs/<NN-phase>/`)으로 한 번 더 이동시켜 추적 영역에 둡니다. 자세한 규약은 `governance` 스킬 문서를 참조하세요.
 
 ## 자동 부트스트랩 (SessionStart 훅)
 
 플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅(`hooks/bootstrap-local.sh`)이 다음을 자동으로 보장합니다:
 
 - 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성 (실행계획 작업 영역)
-- 프로젝트 `.gitignore`에 `.claude/local/` 한 줄 추가 (없으면 새로 만들고, 기존 내용 보존)
+- 프로젝트 `.gitignore`에 `.claude/` 한 줄 추가 (없으면 새로 만들고, 기존 내용 보존)
+- 레거시 `.claude/local/` 라인은 자동으로 `.claude/`로 교체 (v0.3.x → v0.4.0 무중단 업그레이드)
 
-이 훅은 **idempotent**합니다 — 이미 설정된 프로젝트에서는 아무 동작도 하지 않습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
+`.claude/` 전체가 ignore되므로 플러그인 산출물은 기본적으로 git에 포함되지 않습니다. 이 훅은 **idempotent**합니다 — 이미 설정된 프로젝트에서는 아무 동작도 하지 않습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
 
 훅을 비활성화했거나 외부에서 호출된 경우에도 거버넌스 PLAN 단계가 동일한 보장을 자체적으로 수행합니다.
 

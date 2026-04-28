@@ -1,6 +1,6 @@
 {
   "name": "project-lifecycle",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "프로젝트 전체 라이프사이클을 단계별로 가이드하는 플러그인. 초기 설정부터 아이디어 수집, 기획, 설계, 디자인, 구현, 인프라, QA, 운영/회고까지 각 단계의 베스트 프랙티스와 템플릿을 제공하며, Plan-Review-Execute-Reverify 거버넌스와 ALM 관점의 추적성을 관리합니다.",
   "author": {
     "name": "SHAUL"

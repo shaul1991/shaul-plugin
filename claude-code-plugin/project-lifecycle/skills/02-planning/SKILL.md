@@ -34,7 +34,7 @@ metadata:
 > ⚠️ 실행계획 수립과 수락 없이 실행에 들어가지 않는다. 실행 후 재검증 없이 다음 Phase로 넘어가지 않는다.
 
 ## 전제 조건
-- Phase 1 (아이디어 수집)의 `docs/01-ideation/idea-brief.md`가 존재해야 한다
+- Phase 1 (아이디어 수집)의 `.claude/01-ideation/idea-brief.md`가 존재해야 한다
 - 없을 경우 사용자에게 Phase 1 먼저 진행할지 또는 간략 요약으로 대체할지 확인
 
 ## 실행 절차
@@ -76,9 +76,9 @@ MVP (Minimum Viable Product) 범위를 확정한다:
 ### Step 4: 산출물 생성
 아래 파일들을 생성한다:
 
-- **`docs/02-planning/prd.md`** — `references/prd-template.md` 기반
-- **`docs/02-planning/user-stories.md`** — 유저 스토리 목록
-- **`docs/02-planning/scope.md`** — 스코프 및 마일스톤
+- **`.claude/02-planning/prd.md`** — `references/prd-template.md` 기반
+- **`.claude/02-planning/user-stories.md`** — 유저 스토리 목록
+- **`.claude/02-planning/scope.md`** — 스코프 및 마일스톤
 
 ## 가이드라인
 

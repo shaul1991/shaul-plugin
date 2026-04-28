@@ -34,9 +34,9 @@ metadata:
 > ⚠️ 실행계획 수립과 수락 없이 실행에 들어가지 않는다. 실행 후 재검증 없이 다음 Phase로 넘어가지 않는다.
 
 ## 전제 조건
-- Phase 3의 기술 스택 결정 (`docs/03-architecture/tech-stack.md`)
-- Phase 3의 API 설계 (`docs/03-architecture/api-spec.md`)
-- Phase 4의 디자인 시스템 (`docs/04-design/design-system.md`) — 선택
+- Phase 3의 기술 스택 결정 (`.claude/03-architecture/tech-stack.md`)
+- Phase 3의 API 설계 (`.claude/03-architecture/api-spec.md`)
+- Phase 4의 디자인 시스템 (`.claude/04-design/design-system.md`) — 선택
 
 ## 실행 절차
 
@@ -105,8 +105,8 @@ MVP 스코프의 Must Have 기능을 구현 순서를 정한다:
 > 셀프 리뷰에서 발견된 문제는 즉시 수정한 후 다음 단계로 진행한다.
 
 ### Step 6: 산출물 생성
-- **`docs/05-implementation/conventions.md`** — 코딩 컨벤션
-- **`docs/05-implementation/setup-guide.md`** — 개발 환경 셋업 가이드
+- **`.claude/05-implementation/conventions.md`** — 코딩 컨벤션
+- **`.claude/05-implementation/setup-guide.md`** — 개발 환경 셋업 가이드
 - **실제 프로젝트 코드** — 프로젝트 루트에 생성
 
 ## 가이드라인

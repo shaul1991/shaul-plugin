@@ -34,8 +34,8 @@ metadata:
 > ⚠️ 실행계획 수립과 수락 없이 실행에 들어가지 않는다. 실행 후 재검증 없이 다음 Phase로 넘어가지 않는다.
 
 ## 전제 조건
-- Phase 2의 유저 스토리 (`docs/02-planning/user-stories.md`)
-- Phase 3의 API 설계 (`docs/03-architecture/api-spec.md`)
+- Phase 2의 유저 스토리 (`.claude/02-planning/user-stories.md`)
+- Phase 3의 API 설계 (`.claude/03-architecture/api-spec.md`)
 
 ## 실행 절차
 
@@ -73,7 +73,7 @@ Claude Code는 텍스트 기반 에이전트이므로, 시각적 디자인보다
    - 에러 및 엣지 케이스 처리
    - 애니메이션 및 트랜지션
 
-2. **산출물** — 각 화면마다 `docs/04-design/interaction-specs/[화면ID].md` 생성
+2. **산출물** — 각 화면마다 `.claude/04-design/interaction-specs/[화면ID].md` 생성
 
 > 인터랙션 명세서는 Phase 5에서 개발자가 코드를 구현할 때 참고하는 구체적인 입력 문서로, 와이어프레임보다 더 상세한 동작 명세를 포함한다.
 
@@ -95,11 +95,11 @@ HTML/CSS 또는 React로 핵심 화면의 인터랙티브 프로토타입을 만
 4. 디자인 토큰을 CSS 변수로 정의
 
 ### Step 6: 산출물 생성
-- **`docs/04-design/sitemap.md`** — 정보 구조 및 화면 목록
-- **`docs/04-design/user-flows.md`** — 사용자 흐름도
-- **`docs/04-design/design-system.md`** — 디자인 시스템 정의
-- **`docs/04-design/wireframes.md`** — 와이어프레임
-- **`docs/04-design/interaction-specs/`** — 인터랙션 명세서 (화면별)
+- **`.claude/04-design/sitemap.md`** — 정보 구조 및 화면 목록
+- **`.claude/04-design/user-flows.md`** — 사용자 흐름도
+- **`.claude/04-design/design-system.md`** — 디자인 시스템 정의
+- **`.claude/04-design/wireframes.md`** — 와이어프레임
+- **`.claude/04-design/interaction-specs/`** — 인터랙션 명세서 (화면별)
 - **`prototype/`** — 프로토타입 코드 (선택)
 
 ## 가이드라인

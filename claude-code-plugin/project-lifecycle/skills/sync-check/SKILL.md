@@ -12,7 +12,7 @@ metadata:
 
 # 문서-코드 동기화 검증 (Sync Check)
 
-설계 문서(docs/)와 실제 코드 사이의 불일치(Drift)를 체계적으로 탐지하고,
+설계 문서(.claude/)와 실제 코드 사이의 불일치(Drift)를 체계적으로 탐지하고,
 어떤 쪽을 업데이트해야 하는지 판단하여 수정을 제안한다.
 
 > **담당 에이전트**: `code-analyst` (시니어 소프트웨어 분석가)
@@ -30,12 +30,12 @@ metadata:
 
 | 문서 (Source of Truth) | 코드/구현 | 검증 포인트 |
 |----------------------|----------|------------|
-| `docs/03-architecture/api-spec.md` | 실제 API 라우트/핸들러 | 엔드포인트 URL, 메서드, 파라미터, 응답 형태 |
-| `docs/03-architecture/data-model.md` | DB 스키마/마이그레이션 | 테이블명, 컬럼, 타입, 관계, 인덱스 |
-| `docs/03-architecture/tech-stack.md` | package.json / requirements.txt | 실제 사용 기술, 버전 |
-| `docs/05-implementation/conventions.md` | 실제 코드 | 네이밍, 디렉토리 구조, 에러 처리 패턴 |
-| `docs/04-design/interaction-specs/` | UI 컴포넌트 코드 | 컴포넌트 props, 상태, 이벤트 핸들러 |
-| `docs/06-infra/infrastructure.md` | Dockerfile, CI/CD, IaC | 환경 구성, 파이프라인 단계, 인프라 설정 |
+| `.claude/03-architecture/api-spec.md` | 실제 API 라우트/핸들러 | 엔드포인트 URL, 메서드, 파라미터, 응답 형태 |
+| `.claude/03-architecture/data-model.md` | DB 스키마/마이그레이션 | 테이블명, 컬럼, 타입, 관계, 인덱스 |
+| `.claude/03-architecture/tech-stack.md` | package.json / requirements.txt | 실제 사용 기술, 버전 |
+| `.claude/05-implementation/conventions.md` | 실제 코드 | 네이밍, 디렉토리 구조, 에러 처리 패턴 |
+| `.claude/04-design/interaction-specs/` | UI 컴포넌트 코드 | 컴포넌트 props, 상태, 이벤트 핸들러 |
+| `.claude/06-infra/infrastructure.md` | Dockerfile, CI/CD, IaC | 환경 구성, 파이프라인 단계, 인프라 설정 |
 
 ### Step 2: 자동 탐지
 코드를 스캔하여 문서와 대조한다:
@@ -90,8 +90,8 @@ metadata:
 - **양쪽 다 오래됨** → 현재 요구사항 확인 후 양쪽 모두 수정
 
 ### Step 5: 산출물
-- **드리프트 보고서** — `docs/sync-check-report.md` (또는 날짜별)
-- **수정된 문서** — 해당 docs/ 파일 업데이트
+- **드리프트 보고서** — `.claude/sync-check-report.md` (또는 날짜별)
+- **수정된 문서** — 해당 .claude/ 파일 업데이트
 - **lifecycle.md 이력** — 변경 관리 로그에 기록
 
 ## 트리거 시점

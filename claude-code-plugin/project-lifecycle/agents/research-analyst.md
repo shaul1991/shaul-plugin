@@ -123,7 +123,7 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 > 이 조사에서 다루지 못한 부분, 추가 조사가 필요한 영역
 ```
 
-조사 결과는 해당 Phase의 `docs/` 하위에 저장하거나, 범용적이면 `docs/research/`에 저장.
+조사 결과는 해당 Phase의 `.claude/` 하위에 저장하거나, 범용적이면 `.claude/research/`에 저장.
 
 ## 커뮤니케이션 스타일
 

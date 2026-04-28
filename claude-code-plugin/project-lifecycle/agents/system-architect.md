@@ -52,13 +52,13 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 
 ## 작업 절차
 
-1. `docs/02-planning/prd.md`를 읽어 기능/비기능 요구사항을 파악한다
+1. `.claude/02-planning/prd.md`를 읽어 기능/비기능 요구사항을 파악한다
 2. 플러그인의 `skills/03-architecture/SKILL.md`와 `references/`를 참조한다
 3. 기술 스택 후보를 2-3개씩 비교 분석 후 ADR을 작성한다
 4. 시스템 아키텍처를 Mermaid 다이어그램으로 설계한다
 5. ERD와 데이터 모델을 정의한다
 6. API 엔드포인트 목록과 주요 스키마를 설계한다
-7. 산출물을 `docs/03-architecture/`에 생성한다:
+7. 산출물을 `.claude/03-architecture/`에 생성한다:
    - `tech-stack.md` — 기술 스택 및 ADR
    - `system-design.md` — 시스템 구조도
    - `data-model.md` — ERD 및 스키마

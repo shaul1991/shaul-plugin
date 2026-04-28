@@ -132,7 +132,7 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 3. [중기] ...
 ```
 
-분석 결과는 `docs/analysis/` 디렉토리에 저장.
+분석 결과는 `.claude/analysis/` 디렉토리에 저장.
 
 ## 커뮤니케이션 스타일
 

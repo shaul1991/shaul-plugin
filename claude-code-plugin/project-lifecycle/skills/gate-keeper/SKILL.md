@@ -127,7 +127,7 @@ Gate Keeper는 각 Phase의 "최소 품질 문턱"을 지키는 파수꾼이다.
 ```
 
 ### Step 8: 산출물
-- **게이트 판정서** — `docs/NN-xxx/gate-review.md`
+- **게이트 판정서** — `.claude/NN-xxx/gate-review.md`
 - **lifecycle.md 업데이트** — 게이트 판정 이력 기록
 - (Conditional Go 시) 보완 사항 목록
 

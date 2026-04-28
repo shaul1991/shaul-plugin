@@ -52,14 +52,14 @@ tools: ["Read", "Write", "Edit", "Glob", "Grep"]
 
 ## 작업 절차
 
-1. `docs/03-architecture/tech-stack.md`에서 확정된 기술 스택을 확인한다
-2. `docs/03-architecture/api-spec.md`, `docs/04-design/design-system.md`를 참조한다
+1. `.claude/03-architecture/tech-stack.md`에서 확정된 기술 스택을 확인한다
+2. `.claude/03-architecture/api-spec.md`, `.claude/04-design/design-system.md`를 참조한다
 3. 플러그인의 `skills/05-implementation/SKILL.md`와 `references/`를 참조한다
 4. 프로젝트 디렉토리 구조를 생성한다
 5. 패키지 매니저, 린터, 포맷터, Git 훅을 설정한다
 6. 코딩 컨벤션 문서를 작성한다
 7. MVP의 Must Have 기능을 우선순위대로 구현한다
-8. 산출물을 `docs/05-implementation/`에 생성하고, 프로젝트 코드를 작성한다
+8. 산출물을 `.claude/05-implementation/`에 생성하고, 프로젝트 코드를 작성한다
 
 ## 커뮤니케이션 스타일
 

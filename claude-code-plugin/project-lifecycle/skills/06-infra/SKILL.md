@@ -34,7 +34,7 @@ metadata:
 > ⚠️ 실행계획 수립과 수락 없이 실행에 들어가지 않는다. 실행 후 재검증 없이 다음 Phase로 넘어가지 않는다.
 
 ## 전제 조건
-- Phase 3의 기술 스택 및 배포 구조 (`docs/03-architecture/tech-stack.md`)
+- Phase 3의 기술 스택 및 배포 구조 (`.claude/03-architecture/tech-stack.md`)
 - Phase 5의 프로젝트 코드가 기본 구조 갖춤
 
 ## 실행 절차
@@ -105,9 +105,9 @@ Dockerfile 베스트 프랙티스:
 5. **WAF** — 웹 방화벽 (필요 시)
 
 ### Step 6: 산출물 생성
-- **`docs/06-infra/infrastructure.md`** — 인프라 구성 문서
-- **`docs/06-infra/ci-cd.md`** — CI/CD 파이프라인 문서
-- **`docs/06-infra/monitoring.md`** — 모니터링/알림 설정
+- **`.claude/06-infra/infrastructure.md`** — 인프라 구성 문서
+- **`.claude/06-infra/ci-cd.md`** — CI/CD 파이프라인 문서
+- **`.claude/06-infra/monitoring.md`** — 모니터링/알림 설정
 - **인프라 코드** — Dockerfile, docker-compose.yml, CI/CD 설정 파일
 
 ## 가이드라인
