@@ -41,7 +41,14 @@ metadata:
 
 ### PLAN 사전 준비 (모든 Phase 공통, 매 PLAN 진입 시 수행)
 
-실행계획서 파일을 쓰기 **전에** 아래 항목을 보장한다. 사용자가 Phase 0(`00-setup`)을 건너뛰고 다른 Phase부터 시작했더라도, 어떤 Phase의 PLAN이든 이 절차를 자체적으로 수행해 환경을 정합 상태로 만든다.
+플러그인이 설치된 사용자 프로젝트에서는 **SessionStart 훅**(`hooks/bootstrap-local.sh`)이 세션 시작 시 자동으로 다음을 보장한다:
+
+- 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성
+- 프로젝트 `.gitignore`에 `.claude/local/` 한 줄 추가 (없으면 새로 만들고, 기존 내용은 보존)
+- 이미 적용된 프로젝트에서는 아무 동작도 하지 않는다 (idempotent)
+- 사용자의 cwd가 git 저장소가 아니면 동작하지 않는다 (보수적 가드)
+
+훅이 실행되지 못한 환경(예: 훅을 비활성화한 사용자, 플러그인 외부 호출)을 대비하여, **모든 Phase의 PLAN 단계는 실행계획서 파일을 쓰기 전에** 동일한 보장을 자체적으로 수행한다:
 
 1. 프로젝트 루트의 `.gitignore`에 `.claude/local/` 줄이 있는지 확인한다.
    - 없으면 한 줄 추가한다 (`.gitignore`가 없으면 새로 만든다).
@@ -50,7 +57,7 @@ metadata:
 3. `.claude/local/plans/<branch>/<NN-phase>/` 디렉토리를 생성한다 (없을 경우).
 4. 위 디렉토리에 `execution-plan.md`를 작성한다.
 
-이 절차는 플러그인이 **사용자 프로젝트에 설치되어 사용될 때**에도 동일하게 적용된다 — 어느 Phase가 먼저 호출되든 작업 영역과 gitignore 보호가 자동으로 정합화된다.
+이 절차는 사용자가 Phase 0(`00-setup`)을 건너뛰고 다른 Phase부터 시작했을 때, 또는 SessionStart 훅이 실행되지 않은 환경에서도 작업 영역과 gitignore 보호가 정합 상태로 유지됨을 보장한다.
 
 ### 실행계획서 구조
 
