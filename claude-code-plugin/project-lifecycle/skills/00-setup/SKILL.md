@@ -19,7 +19,7 @@ metadata:
 **이 Phase를 시작하기 전에 반드시 거버넌스 프로세스를 따른다.**
 
 1. **PLAN** — 실행계획서를 작성한다 (`governance` 스킬의 `references/execution-plan-template.md` 참조)
-   - 해당 Phase의 `docs/` 디렉토리에 `execution-plan.md`로 저장
+   - `.claude/local/plans/<sanitized-branch>/00-setup/execution-plan.md`로 저장 (브랜치별 작업 영역, gitignore 대상)
    - 목표, 범위, 실행 단계, 성공 기준을 구체적으로 기술
 2. **REVIEW** — 실행계획서를 사용자에게 제시하고 명시적 수락을 받는다
    - 승인(Approved) → 실행 절차로 진행
@@ -63,6 +63,12 @@ metadata:
    - 프로젝트 개요, 기술 스택, 디렉토리 구조, 코딩 컨벤션 요약
 2. **`.editorconfig`** — 에디터 공통 설정 (들여쓰기, 줄바꿈 등)
 3. **`.gitignore`** — 버전 관리 제외 파일 목록
+   - 다음 한 줄을 반드시 포함시킨다 (실행계획서 작업 영역 보호):
+     ```
+     .claude/local/
+     ```
+   - 이미 동일 경로(또는 `.claude/local`/`.claude/local/*`)가 등록되어 있으면 중복 추가하지 않는다.
+   - `.gitignore` 파일이 없으면 새로 만든다.
 4. **`docs/` 디렉토리 초기화** — lifecycle.md 생성
 
 ### Step 4: ALM 추적 파일 초기화

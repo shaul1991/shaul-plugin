@@ -47,6 +47,10 @@ Phase에 종속되지 않고 전체 라이프사이클에서 횡단적으로 호
 ```
 your-project/
 ├── CLAUDE.md                   ← 에이전트 컨텍스트 파일
+├── .claude/
+│   └── local/                  ← gitignore 대상 작업 영역 (브랜치별 실행계획 등)
+│       └── plans/
+│           └── <branch>/<NN-phase>/execution-plan.md
 └── docs/
     ├── lifecycle.md            ← ALM 추적 정보
     ├── tech-debt-registry.md   ← 기술 부채 기록부
@@ -100,7 +104,18 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
                                                               PLAN으로 복귀
 ```
 
-각 Phase 진입 시 `execution-plan.md`가 해당 Phase의 docs 디렉토리에 생성되며, 목표, 범위, 실행 단계, 성공 기준, 재검증 기준이 명시됩니다.
+각 Phase 진입 시 `execution-plan.md`는 **브랜치별 작업 영역**인 `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 생성됩니다 (목표, 범위, 실행 단계, 성공 기준, 재검증 기준 명시). 이 영역은 `.gitignore` 처리되어 git 추적에서 제외되며, 세션이 종료되어도 디스크에 남아 다음 세션에서 이어서 사용할 수 있습니다. 합의된 계획을 영구 산출물로 보존하려면 사용자가 직접 `docs/<NN-phase>/`로 이동/복사하여 승격(promote)합니다. 자세한 규약은 `governance` 스킬 문서를 참조하세요.
+
+## 자동 부트스트랩 (SessionStart 훅)
+
+플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅(`hooks/bootstrap-local.sh`)이 다음을 자동으로 보장합니다:
+
+- 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성 (실행계획 작업 영역)
+- 프로젝트 `.gitignore`에 `.claude/local/` 한 줄 추가 (없으면 새로 만들고, 기존 내용 보존)
+
+이 훅은 **idempotent**합니다 — 이미 설정된 프로젝트에서는 아무 동작도 하지 않습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
+
+훅을 비활성화했거나 외부에서 호출된 경우에도 거버넌스 PLAN 단계가 동일한 보장을 자체적으로 수행합니다.
 
 ## 사용 방법
 

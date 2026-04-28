@@ -31,7 +31,7 @@ Gate Keeper는 각 Phase의 "최소 품질 문턱"을 지키는 파수꾼이다.
 
 ```
 현재 Phase: Phase N
-실행계획서 위치: docs/NN-xxx/execution-plan.md
+실행계획서 위치: .claude/local/plans/<sanitized-branch>/NN-xxx/execution-plan.md
 성공 기준: 실행계획서 §7 (Success Criteria)
 재검증 기준: 실행계획서 §8 (Re-verification Criteria)
 ```

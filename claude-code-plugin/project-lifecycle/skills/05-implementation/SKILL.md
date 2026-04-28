@@ -18,7 +18,7 @@ metadata:
 **이 Phase를 시작하기 전에 반드시 거버넌스 프로세스를 따른다.**
 
 1. **PLAN** — 실행계획서를 작성한다 (`governance` 스킬의 `references/execution-plan-template.md` 참조)
-   - 해당 Phase의 `docs/` 디렉토리에 `execution-plan.md`로 저장
+   - `.claude/local/plans/<sanitized-branch>/05-implementation/execution-plan.md`로 저장 (브랜치별 작업 영역, gitignore 대상)
    - 목표, 범위, 실행 단계, 성공 기준을 구체적으로 기술
 2. **REVIEW** — 실행계획서를 사용자에게 제시하고 명시적 수락을 받는다
    - 승인(Approved) → 실행 절차로 진행
