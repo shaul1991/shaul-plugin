@@ -12,7 +12,8 @@
 - **Plan-Review-Execute-Reverify 거버넌스** — 모든 Phase 진입 시 실행계획서 작성 → 사용자 명시적 수락 → 실행 → 재검증의 4단계를 강제.
 - **브랜치별 실행계획 작업 영역** — `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`에 자동 저장. 브랜치를 갈아타도 계획이 섞이지 않고, 세션이 종료되어도 디스크에 기록으로 남습니다.
 - **SessionStart 자동 부트스트랩** — 사용자 프로젝트에서 세션이 시작되면 `.claude/local/plans/` 디렉토리와 `.gitignore` 처리가 자동으로 보장됩니다 (idempotent, git 저장소에서만 동작).
-- **15개 스킬 + 14개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
+- **사내 3종 문서 통합 관리 (v0.6.0)** — 신규 `knowledge` 스킬이 용어집·기획요구·기술요구를 인덱스(lazy-load) 한 묶음으로 관리합니다. 다른 AI 도구(Cursor·Codex·Copilot·Gemini 등) 도달이 필요하면 사용자가 인덱스를 루트 `AGENTS.md` 로 *수동 승격*(이동·심링크). 신규 `domain-liaison` 에이전트가 팀별·도메인 간 vocabulary 일관성을 책임집니다.
+- **16개 스킬 + 15개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper`, `knowledge` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
 - **ALM 추적성** — `.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`로 요구사항·설계·코드·테스트·KPI의 연결을 관리. (공유가 필요하면 사용자가 직접 추적 영역으로 이동)
 
 ---

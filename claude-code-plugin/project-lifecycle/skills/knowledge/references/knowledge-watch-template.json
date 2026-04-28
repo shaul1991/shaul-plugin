@@ -1,0 +1,24 @@
+{
+  "$comment": "Knowledge change-detection baseline. NOT a content mirror — only file path + sha256 for SessionStart drift alerts. See docs/direction/2026-04-28-three-doc-set-charter.md (D8).",
+  "schema_version": "1",
+  "registered_at": "2026-04-28T00:00:00Z",
+  "updated_at": "2026-04-28T00:00:00Z",
+  "watched_files": [
+    {
+      "path": ".claude/knowledge/index.md",
+      "sha256": "<computed-on-write>"
+    },
+    {
+      "path": ".claude/knowledge/glossary.md",
+      "sha256": "<computed-on-write>"
+    },
+    {
+      "path": ".claude/knowledge/product-requirements.md",
+      "sha256": "<computed-on-write>"
+    },
+    {
+      "path": ".claude/knowledge/technical-requirements.md",
+      "sha256": "<computed-on-write>"
+    }
+  ]
+}

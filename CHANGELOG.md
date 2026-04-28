@@ -6,6 +6,55 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-04-28
+
+### Added
+- **사내 3종 문서 통합 관리 (`knowledge` 스킬).** 신규 크로스커팅 스킬이
+  `.claude/knowledge/` 영역에 4 산출물을 사용자 입력 기반으로 등록·갱신한다:
+  - `index.md` — 진입점 인덱스(lazy-load: 항상 인덱스부터, 3 산출물은 필요할 때만 펼침)
+  - `glossary.md` — 사내 평면 용어집(용어/영문/정의/예시/링크)
+  - `product-requirements.md` — 기획적 요구사항 요약(PRD 핵심 + 출처 링크)
+  - `technical-requirements.md` — 기술적 요구사항 요약(설계 핵심 + 출처 링크)
+  플러그인은 코드/매니페스트에서 추측하지 않으며, 모든 항목은 사용자 입력에서 온다.
+- **신규 전문 에이전트 `domain-liaison` (도메인 연락관).** 14 → 15 에이전트.
+  팀별·도메인 간 소통, 3종 문서 상호 참조 일관성, 기획↔기술 vocabulary
+  통역·중재, 신규 입사자 온보딩 가이드 청지기 역할. `gate-keeper` 의
+  "용어 일관성" 검증을 위임받는다.
+- **SessionStart knowledge 변경 감지** (`hooks/knowledge-watch.sh`). 4 파일의
+  sha256 을 등록 시점 베이스라인(`.claude/local/knowledge-watch.json`)과
+  비교해 변경 시 모델 컨텍스트에 *알림*만 주입(자동 갱신 X). 베이스라인은
+  *콘텐츠 미러가 아니라* 경로 + sha256 만 담는 변경 감지 메타데이터다.
+- **루트 `AGENTS.md` 권장 가이드.** 다중 AI 도구(Codex CLI, Cursor, Copilot,
+  Gemini, Aider 등) 도달을 위해 사용자가 인덱스를 루트 `AGENTS.md` 로
+  *수동 이동·심링크* 하는 것을 권장. 플러그인은 *어떤 경우에도 `AGENTS.md` 를
+  자동 생성·수정·승격하지 않는다* (헌장 원칙 5 — 도구 비종속).
+- `references/index-template.md`, `references/glossary-template.md`,
+  `references/product-requirements-template.md`,
+  `references/technical-requirements-template.md`,
+  `references/knowledge-watch-template.json` — knowledge 스킬 템플릿 5종.
+- `docs/direction/2026-04-28-three-doc-set-charter.md` — 본 변경의 사용자
+  원문 요구·도출 원칙·설계 결정을 보존하는 헌장.
+- `docs/plans/2026-04-28-three-doc-set-and-domain-agent-research.md` —
+  헌장 입력이 된 외부 AI 도구 조사 노트.
+
+### Changed
+- `gate-keeper/SKILL.md` Step 4 의 "용어 일관성" 행이 `domain-liaison` 에
+  검증 위임 형태로 바뀌었다. 게이트 표는 그대로 유지되며, 글로서리 미등록
+  프로젝트에서는 *⚠️ N/A — knowledge 미등록* 으로 표기 후 `/knowledge`
+  호출을 권유한다(자동 등록 X).
+- `00-setup/SKILL.md` Step 6 신설 — knowledge 영역 *권유* 안내. 자동
+  생성하지 않는다.
+- SessionStart 훅이 세 단계로 동작: ① `bootstrap-local.sh` ②
+  `stack-watch.sh` ③ `knowledge-watch.sh` (신규).
+
+### Migration (v0.5.x → v0.6.0)
+별도 작업 불필요. 기존 사용자가 `/knowledge` 를 호출하면 SKILL 이
+*등록 모드* 로 진입해 3종 문서 입력을 받는다. 4 파일 작성과
+`.claude/local/knowledge-watch.json` 베이스라인이 같이 만들어지고,
+이후 세션부터 SessionStart 훅(`knowledge-watch.sh`)이 변경 감지를 시작한다.
+다른 AI 도구 도달이 필요하면 사용자가 직접 `ln -s .claude/knowledge/index.md AGENTS.md`
+또는 `git mv .claude/knowledge/index.md AGENTS.md` 등 *수동 승격*을 수행한다.
+
 ## [0.5.0] — 2026-04-28
 
 ### Added

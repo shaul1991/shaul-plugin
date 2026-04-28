@@ -70,11 +70,13 @@ Gate Keeper는 각 Phase의 "최소 품질 문턱"을 지키는 파수꾼이다.
 현재 Phase의 산출물이 이전 Phase 산출물과 일관되는지 확인한다:
 
 **크로스 Phase 정합성 체크:**
-| 검증 항목 | 원본 | 현재 | 일치 여부 |
-|----------|------|------|----------|
-| 기능 범위 | PRD (Phase 2) | 현재 산출물 | ✅/❌ |
-| 기술 결정 | tech-stack (Phase 3) | 현재 산출물 | ✅/❌ |
-| 용어 일관성 | 전체 docs | 현재 산출물 | ✅/❌ |
+| 검증 항목 | 원본 | 현재 | 검증 담당 | 일치 여부 |
+|----------|------|------|----------|----------|
+| 기능 범위 | PRD (Phase 2) | 현재 산출물 | `quality-reviewer` | ✅/❌ |
+| 기술 결정 | tech-stack (Phase 3) | 현재 산출물 | `quality-reviewer` | ✅/❌ |
+| 용어 일관성 | 전체 docs (특히 `.claude/knowledge/glossary.md`) | 현재 산출물 | **`domain-liaison` 위임** | ✅/❌ |
+
+> **위임 노트 (v0.6.0+)**: "용어 일관성" 행은 `domain-liaison` 에이전트에 위임한다. gate-keeper 는 호출자로서 결과(✅/❌)만 표에 기재하고, 실제 검증 로직(글로서리 ↔ 산출물 vocabulary 대조, 동의어/별칭 인식, 합의안 제시)은 도메인 연락관이 수행한다. 글로서리(`.claude/knowledge/`)가 아직 등록되지 않은 프로젝트에서는 *⚠️ N/A — knowledge 미등록* 으로 표기하고 사용자에게 `/knowledge` 호출을 권유한다(자동 등록은 하지 않음). 상위 헌장: `docs/direction/2026-04-28-three-doc-set-charter.md` D9.
 
 ### Step 5: 품질 평가
 산출물의 품질을 정성적으로 평가한다:
