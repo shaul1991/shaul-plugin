@@ -29,6 +29,10 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 ### Changed
 - README install instructions now spell out the working-directory
   assumption and provide an absolute-path fallback.
+- README repo layout and contribution guide now document `scripts/`,
+  `CHANGELOG.md`, and `.github/workflows/`, including the obligation to
+  rebuild the archive via `scripts/build-plugin.sh` after editing the
+  plugin source.
 
 ## [0.3.0] — 2026-04-28
 
