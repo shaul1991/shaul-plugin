@@ -27,8 +27,16 @@
 
 ## 설치
 
+저장소를 클론한 뒤 **저장소 루트**에서 다음 명령을 실행합니다:
+
 ```bash
 claude plugin add ./claude-code-plugin/project-lifecycle.plugin
+```
+
+다른 위치에서 설치하려면 `.plugin` 파일의 절대경로를 사용하세요. 예:
+
+```bash
+claude plugin add /path/to/shaul-plugin/claude-code-plugin/project-lifecycle.plugin
 ```
 
 설치 직후 새 세션을 한 번 시작하면, 현재 작업 중인 git 저장소에 다음이 자동으로 만들어집니다:
