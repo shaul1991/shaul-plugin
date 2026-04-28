@@ -4,6 +4,15 @@ All notable changes to the **project-lifecycle** Claude Code plugin are tracked
 here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `.claude-plugin/marketplace.json` — 이 저장소를 Claude Code 플러그인
+  마켓플레이스로 노출. 사용자는 `/plugin marketplace add shaul1991/shaul-plugin`
+  → `/plugin install project-lifecycle@shaul-plugin` 으로 설치 가능.
+- README 설치 섹션에 마켓플레이스 / 로컬 아카이브 / 로컬 마켓플레이스
+  세 가지 설치 경로를 분리해 안내.
+
 ## [0.3.1] — 2026-04-28
 
 ### Fixed
