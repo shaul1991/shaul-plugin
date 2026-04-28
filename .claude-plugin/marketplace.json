@@ -1,11 +1,14 @@
 {
   "name": "shaul-plugin",
   "owner": {
-    "name": "SHAUL"
+    "name": "SHAUL",
+    "url": "https://github.com/shaul1991"
   },
   "metadata": {
     "description": "SHAUL의 Claude Code 플러그인 마켓플레이스. 프로젝트 라이프사이클 거버넌스를 제공하는 project-lifecycle 플러그인을 배포합니다.",
-    "version": "0.6.0"
+    "version": "0.6.0",
+    "homepage": "https://github.com/shaul1991/shaul-plugin",
+    "repository": "https://github.com/shaul1991/shaul-plugin"
   },
   "plugins": [
     {
