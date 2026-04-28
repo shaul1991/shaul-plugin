@@ -63,7 +63,7 @@ your-project/
     │   ├── user-stories.md
     │   └── scope.md
     ├── 03-architecture/
-    │   ├── tech-stack.md
+    │   ├── tech-stack.md          ← 사람 가독 ADR (사용자 입력 기반)
     │   ├── system-design.md
     │   ├── data-model.md
     │   ├── api-spec.md
@@ -90,8 +90,9 @@ your-project/
     │   ├── retrospective.md
     │   └── incident-reports/
     └── local/                  ← 브랜치별 실행계획 작업 영역
-        └── plans/
-            └── <branch>/<NN-phase>/execution-plan.md
+        ├── plans/
+        │   └── <branch>/<NN-phase>/execution-plan.md
+        └── stack.json          ← 머신 가독 미러 (tech-stack.md 와 1대1)
 ```
 
 ### 산출물 공유 (사용자 결정에 의한 추적)
@@ -147,15 +148,47 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
 
 ## 자동 부트스트랩 (SessionStart 훅)
 
-플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅(`hooks/bootstrap-local.sh`)이 다음을 자동으로 보장합니다:
+플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅이 두 단계로 동작합니다:
 
+### 1) `bootstrap-local.sh` — 작업 영역 보장
 - 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성 (실행계획 작업 영역)
 - 프로젝트 `.gitignore`에 `.claude/` 한 줄 추가 (없으면 새로 만들고, 기존 내용 보존)
 - 레거시 `.claude/local/` 라인은 자동으로 `.claude/`로 교체 (v0.3.x → v0.4.0 무중단 업그레이드)
 
-`.claude/` 전체가 ignore되므로 플러그인 산출물은 기본적으로 git에 포함되지 않습니다. 이 훅은 **idempotent**합니다 — 이미 설정된 프로젝트에서는 아무 동작도 하지 않습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
+### 2) `stack-watch.sh` — 기술 스택 컨텍스트 주입 + 변경 감지
+- `.claude/local/stack.json` 이 **없으면** "기술 스택이 등록되지 않았습니다 — `/03-architecture` 로 등록하세요" 한 줄 안내. 자동으로 묻거나 추측하지 않습니다.
+- 있으면 등록된 각 프로젝트의 *요약(언어 + 프레임워크)* 을 모델 컨텍스트에 주입해 후속 단계가 사용자 스택을 인지하도록 합니다.
+- 등록 시점 대비 매니페스트(`composer.json`, `pyproject.toml`, `requirements.txt`)의 sha256 이 달라졌으면 *변경 알림*을 추가로 주입하고 `/03-architecture` 갱신 검토를 권장합니다. 자동 갱신은 하지 않습니다.
+
+`.claude/` 전체가 ignore되므로 플러그인 산출물은 기본적으로 git에 포함되지 않습니다. 두 훅 모두 **idempotent** 하고 *읽기/추가만* 합니다 — 이미 설정된 프로젝트에서는 부작용이 없습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
 
 훅을 비활성화했거나 외부에서 호출된 경우에도 거버넌스 PLAN 단계가 동일한 보장을 자체적으로 수행합니다.
+
+## 기술 스택 등록 & 갱신 (v0.5.0)
+
+03-architecture 스킬은 사용자 프로젝트의 기술 스택을 **사용자 입력 기반**으로 등록·갱신합니다. 플러그인은 매니페스트(`composer.json` 등)를 *읽어 추측하지 않습니다* — 모든 정보는 사용자 입력에서 옵니다.
+
+### 등록 모드 (최초 실행)
+
+`/03-architecture` 호출 → SKILL 이 워크스페이스 구조와 각 프로젝트의 언어·프레임워크를 묻습니다. 다중 프로젝트(모노레포)면 프로젝트별로 따로 입력합니다(예: `apps/api` = PHP+Laravel, `services/jobs` = Python+FastAPI). 사용자가 확인하면 두 산출물이 *동시에* 작성됩니다:
+
+- `.claude/03-architecture/tech-stack.md` — 사람 가독 ADR (권위 있는 결정)
+- `.claude/local/stack.json` — 머신 가독 미러 (다른 단계와 SessionStart 훅이 읽음)
+
+### 갱신 모드 (이후 실행)
+
+`stack.json` 이 이미 있으면 SKILL 이 *갱신 모드*로 진입해, 현재 등록 내용을 표로 보여주고 항목별로 *변경/유지/삭제/추가* 를 묻습니다. SessionStart 훅이 매니페스트 변경을 감지했으면 그 항목이 강조됩니다. 자동 갱신은 없습니다 — 모든 결정은 사용자가 합니다.
+
+### 1차 자동 변경 감지 범위 (v0.5.0)
+
+| 언어 | 프레임워크 | watched 매니페스트 |
+|------|----------|-------------------|
+| PHP | Laravel | `composer.json` |
+| Python | FastAPI | `pyproject.toml`, `requirements.txt` |
+
+그 외 언어/프레임워크도 ADR 에 자유롭게 등록할 수 있습니다 — 단지 자동 변경 감지가 적용되지 않을 뿐입니다(`watched_manifests: []`). 갱신은 사용자가 `/03-architecture` 를 다시 호출해 수행합니다.
+
+상세 원칙은 `docs/direction/2026-04-28-stack-registration-charter.md` 헌장을 참조하세요.
 
 ## 사용 방법
 

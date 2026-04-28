@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "registered_at": "2026-04-28T12:00:00Z",
+  "updated_at": "2026-04-28T12:00:00Z",
+  "workspace_root": "/abs/path/to/repo",
+  "projects": [
+    {
+      "id": "apps/api",
+      "path": "apps/api",
+      "language": "php",
+      "language_version": "8.2",
+      "framework": "laravel",
+      "framework_version": "11.x",
+      "extras": {
+        "db": "mysql",
+        "queue": "redis"
+      },
+      "watched_manifests": [
+        {
+          "path": "apps/api/composer.json",
+          "sha256": "REPLACE_WITH_sha256_OF_FILE_BYTES",
+          "size": 0
+        }
+      ]
+    },
+    {
+      "id": "services/jobs",
+      "path": "services/jobs",
+      "language": "python",
+      "language_version": "3.12",
+      "framework": "fastapi",
+      "framework_version": "0.110.x",
+      "extras": {},
+      "watched_manifests": [
+        {
+          "path": "services/jobs/pyproject.toml",
+          "sha256": "REPLACE_WITH_sha256_OF_FILE_BYTES",
+          "size": 0
+        }
+      ]
+    }
+  ]
+}

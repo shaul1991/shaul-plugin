@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "SHAUL의 Claude Code 플러그인 마켓플레이스. 프로젝트 라이프사이클 거버넌스를 제공하는 project-lifecycle 플러그인을 배포합니다.",
-    "version": "0.4.0"
+    "version": "0.5.0"
   },
   "plugins": [
     {
       "name": "project-lifecycle",
       "source": "./claude-code-plugin/project-lifecycle",
-      "description": "프로젝트 전체 라이프사이클(초기 설정 → 아이디어 → 기획 → 설계 → 디자인 → 구현 → 인프라 → QA → 운영/회고)을 단계별로 가이드. Plan-Review-Execute-Reverify 거버넌스, 브랜치별 실행계획 격리, 15개 스킬과 14개 전문가 에이전트, SessionStart 자동 부트스트랩을 포함합니다.",
-      "version": "0.4.0",
+      "description": "프로젝트 전체 라이프사이클(초기 설정 → 아이디어 → 기획 → 설계 → 디자인 → 구현 → 인프라 → QA → 운영/회고)을 단계별로 가이드. Plan-Review-Execute-Reverify 거버넌스, 브랜치별 실행계획 격리, 사용자 입력 기반 다중 프로젝트 기술 스택 등록·갱신(.claude/local/stack.json), SessionStart 매니페스트 변경 감지, 15개 스킬과 14개 전문가 에이전트를 포함합니다.",
+      "version": "0.5.0",
       "author": {
         "name": "SHAUL"
       },
@@ -34,7 +34,9 @@
         "sync-check",
         "impact-analysis",
         "debt-collector",
-        "gate-keeper"
+        "gate-keeper",
+        "tech-stack",
+        "monorepo"
       ],
       "category": "productivity"
     }

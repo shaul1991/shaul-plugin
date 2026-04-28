@@ -6,6 +6,47 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-04-28
+
+### Added
+- **사용자 입력 기반 기술 스택 등록·갱신.** 03-architecture 스킬이
+  단일/다중 프로젝트(모노레포) 모두에 대해 *사용자가 직접 입력한*
+  언어·프레임워크를 두 산출물에 동시에 기록한다 — 사람 가독 ADR
+  `.claude/03-architecture/tech-stack.md` 와 머신 가독 미러
+  `.claude/local/stack.json`. 플러그인은 자동으로 추측하지 않으며,
+  모든 정보는 사용자 입력에서 온다.
+- **SessionStart 매니페스트 변경 감지** (`hooks/stack-watch.sh`).
+  세션 시작 시 등록된 각 프로젝트의 watched 매니페스트의 sha256 을
+  현재 파일과 비교해, 등록 시점과 달라졌으면 모델 컨텍스트에
+  변경 알림과 함께 *03-architecture 갱신 검토 권장* 메시지를 주입한다.
+  자동 갱신은 하지 않는다 — 변경의 적용은 사용자가 03-architecture 를
+  다시 호출했을 때만 일어난다 (헌장: 추적은 사용자 결정).
+- 1차 watched 매니페스트 범위: PHP+Laravel 의 `composer.json`,
+  Python+FastAPI 의 `pyproject.toml` / `requirements.txt`. 사용자는
+  ADR 에 어떤 언어/프레임워크든 자유롭게 등록할 수 있으며, 1차 범위 외는
+  `watched_manifests: []` 로 두어 사용자가 직접 갱신 호출.
+- `references/stack-json-template.json` — `stack.json` 스키마 v1 예시
+  (다중 프로젝트 포함).
+- `docs/direction/2026-04-28-stack-registration-charter.md` — 본 변경의
+  사용자 원문 요구·도출 원칙·설계 결정을 보존하는 헌장.
+
+### Changed
+- `03-architecture/SKILL.md` 의 Step 1 이 *기술 스택 선정* →
+  *기술 스택 등록 또는 갱신(사용자 입력 우선)* 로 확장. 워크스페이스
+  구조(단일/다중 프로젝트) 입력, 두 파일 동시 작성, 갱신 모드의
+  변경 항목 강조 절차를 명시.
+- SessionStart 훅이 두 단계로 동작: ① `bootstrap-local.sh` (기존,
+  `.claude/local/plans/` + `.gitignore` 라인 보장) ② `stack-watch.sh`
+  (신규, stack.json 미등록 시 안내 / 등록 시 변경 감지).
+
+### Migration (v0.4.x → v0.5.0)
+별도 작업 불필요. 기존 사용자가 `/03-architecture` 를 호출하면 SKILL 이
+*등록 모드*로 진입해 워크스페이스 구조와 각 프로젝트의 언어·프레임워크를
+물어본다. 응답에 따라 `tech-stack.md` 와 `.claude/local/stack.json` 이
+같이 작성되고, 이후 세션부터는 SessionStart 훅이 변경 감지를 시작한다.
+이미 `tech-stack.md` 가 있다면 SKILL 이 그 내용을 stack.json 에 옮겨
+적도록 안내한다.
+
 ## [0.4.0] — 2026-04-28
 
 ### Changed (BREAKING — output layout)
