@@ -43,21 +43,7 @@
 /plugin marketplace update shaul-plugin
 ```
 
-### 방법 2. 로컬 아카이브로 설치
-
-저장소를 클론한 뒤 **저장소 루트**에서 다음 명령을 실행합니다:
-
-```bash
-claude plugin add ./claude-code-plugin/project-lifecycle.plugin
-```
-
-다른 위치에서 설치하려면 `.plugin` 파일의 절대경로를 사용하세요. 예:
-
-```bash
-claude plugin add /path/to/shaul-plugin/claude-code-plugin/project-lifecycle.plugin
-```
-
-### 방법 3. 로컬 마켓플레이스로 설치 (개발/테스트용)
+### 방법 2. 로컬 마켓플레이스로 설치 (개발/테스트용)
 
 저장소를 클론한 디렉토리를 마켓플레이스로 등록하면 소스 변경이 즉시 반영됩니다:
 
@@ -98,12 +84,7 @@ shaul-plugin/
 ├── CHANGELOG.md                              ← 버전별 변경 이력
 ├── .claude-plugin/
 │   └── marketplace.json                      ← 마켓플레이스 매니페스트 (이 저장소를 마켓으로 노출)
-├── scripts/
-│   └── build-plugin.sh                       ← .plugin 아카이브 빌드 (단일 출처)
-├── .github/workflows/
-│   └── plugin-archive-check.yml              ← 아카이브-소스 정합성 CI 가드
 └── claude-code-plugin/
-    ├── project-lifecycle.plugin              ← 마켓플레이스 배포 아카이브 (zip)
     └── project-lifecycle/
         ├── README.md                         ← 상세 매뉴얼 (스킬·에이전트 카탈로그)
         ├── .claude-plugin/plugin.json
@@ -128,6 +109,6 @@ shaul-plugin/
 
 - 브랜치 네이밍은 `claude/<주제>` 또는 `feature/<주제>` 컨벤션을 따릅니다.
 - 작업 중 작성되는 실행계획은 자동으로 `.claude/local/plans/<branch>/...`에 저장되며 git 추적에서 제외됩니다. 합의가 끝난 계획만 사용자가 직접 `docs/`로 승격(promote)합니다.
-- `claude-code-plugin/project-lifecycle/` 하위(스킬·에이전트·훅·`plugin.json`)를 수정했다면 반드시 `bash scripts/build-plugin.sh`로 `.plugin` 아카이브를 재생성한 뒤 함께 커밋합니다. `.github/workflows/plugin-archive-check.yml`이 아카이브와 소스의 불일치를 CI에서 차단합니다.
+- `claude-code-plugin/project-lifecycle/` 하위(스킬·에이전트·훅·`plugin.json`)를 수정하면 마켓플레이스 매니페스트(`.claude-plugin/marketplace.json`)의 `version` 및 해당 plugin entry의 `version`을 함께 갱신합니다.
 - 사용자에게 영향을 주는 변경은 `CHANGELOG.md`에 항목을 추가합니다(Keep a Changelog 형식, SemVer).
 - PR을 올리기 전 `governance` 스킬의 재검증 체크리스트를 먼저 통과시키는 것을 권장합니다.
