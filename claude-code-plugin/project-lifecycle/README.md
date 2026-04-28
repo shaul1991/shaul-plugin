@@ -155,7 +155,7 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
 
 ## 자동 부트스트랩 (SessionStart 훅)
 
-플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅이 두 단계로 동작합니다:
+플러그인이 설치된 사용자 프로젝트에서 Claude Code 세션이 시작되면, 플러그인의 `SessionStart` 훅이 세 단계로 동작합니다:
 
 ### 1) `bootstrap-local.sh` — 작업 영역 보장
 - 프로젝트 루트에 `.claude/local/plans/` 디렉토리 생성 (실행계획 작업 영역)
@@ -175,6 +175,49 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
 `.claude/` 전체가 ignore되므로 플러그인 산출물은 기본적으로 git에 포함되지 않습니다. 세 훅 모두 **idempotent** 하고 *읽기/추가만* 합니다 — 이미 설정된 프로젝트에서는 부작용이 없습니다. 사용자의 cwd가 git 저장소가 아니면 어떤 변경도 하지 않습니다 (보수적 가드).
 
 훅을 비활성화했거나 외부에서 호출된 경우에도 거버넌스 PLAN 단계가 동일한 보장을 자체적으로 수행합니다.
+
+## 시크릿 파일 가드 (v0.7.0)
+
+플러그인은 `Read`/`Edit`/`Write`/`Bash` 도구가 시크릿 파일을 만지려 시도할 때 **무조건** 차단하거나 사용자에게 묻습니다. 어느 step·skill·에이전트에서 호출되든 동일하게 적용됩니다(skill 별 우회 경로 없음).
+
+### 동작 방식 — `PreToolUse` 훅 (`secret-guard.sh`)
+
+세션 시작이 아니라 *각 도구 호출 직전*에 동작합니다.
+
+- **차단 (`always_block`)** → `permissionDecision: "deny"` + exit 2. Claude Code 가 도구를 실행하지 않습니다.
+- **묻기 (`ask_before_read`)** → `permissionDecision: "ask"`. 사용자에게 인라인 프롬프트가 떠서 확인 후 진행.
+- **통과** → 무출력 + exit 0.
+
+### 사용자 정책 — `.claude/secret-guard.json` (직접 편집)
+
+```json
+{
+  "schema_version": 1,
+  "always_block": [".env", ".env.*"],
+  "ask_before_read": [],
+  "exempt_suffixes": [".example", ".sample", ".template", ".dist"]
+}
+```
+
+- 매칭은 *basename* 기준 fnmatch 글롭(`*`, `?`, `[..]`).
+- 두 카테고리 동시 매치 시 우선순위: `always_block` > `ask_before_read`.
+- `exempt_suffixes` 는 양 카테고리 공통 적용(매치되더라도 이 접미사로 끝나면 통과).
+- 정책 파일이 *없으면* 위 스키마와 동일한 내장 기본값이 적용됩니다.
+- 시작 샘플: `claude-code-plugin/project-lifecycle/hooks/secret-guard-template.json` 을 `.claude/secret-guard.json` 으로 복사 후 편집.
+
+### Bash 명령어 검사
+
+`Bash` 도구는 `command` 인자를 토큰화해 각 토큰의 basename 으로 검사합니다. `cat .env`, `source .env`, `grep KEY .env`, `cp .env /tmp/` 등은 모두 차단됩니다. `cat .env.example` 처럼 템플릿 접미사는 통과합니다.
+
+### 일시 해제 (Opt-out)
+
+```bash
+CLAUDE_PLUGIN_SECRET_GUARD=off claude
+```
+
+세션 단위·명시적·트레이스 가능. 우회 시 stderr 에 알림 한 줄. 세션 종료 시 자동 복원.
+
+상세 원칙은 `docs/direction/2026-04-28-secret-file-guardrail-charter.md` 헌장을 참조하세요.
 
 ## 기술 스택 등록 & 갱신 (v0.5.0)
 

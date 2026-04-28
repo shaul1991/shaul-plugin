@@ -6,6 +6,40 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-04-28
+
+### Added — Security
+- **`PreToolUse` 시크릿 파일 가드 훅** (`hooks/secret-guard.sh`).
+  `Read`/`Edit`/`Write`/`Bash` 도구가 시크릿 파일을 만지려 시도하면 *차단*하거나
+  *사용자에게 묻기*. 플러그인의 어느 step·skill·에이전트에서도 *무조건* 적용된다.
+  - 차단(`always_block`) → `permissionDecision: "deny"` + exit 2
+  - 묻기(`ask_before_read`) → `permissionDecision: "ask"` (Claude Code 인라인 프롬프트)
+  - 통과 → 무출력 + exit 0
+- **사용자 정책 파일 `.claude/secret-guard.json`**. 사용자가 직접 편집 가능한 JSON.
+  스키마 v1: `always_block`(deny), `ask_before_read`(ask), `exempt_suffixes`(템플릿 예외).
+  매칭은 *basename* 기준 fnmatch 글롭(`*`, `?`, `[..]`). 정책 파일 부재 시 내장 기본값
+  적용(`.env`, `.env.*` 차단 + `.example`/`.sample`/`.template`/`.dist` 예외).
+- **시작 샘플 `hooks/secret-guard-template.json`** — `.claude/secret-guard.json` 으로 복사해
+  편집할 수 있는 템플릿. 흔한 후보(예: `id_rsa*`, `*.pem`, `.aws/credentials`) 는 `$examples`
+  로 안내.
+- **Opt-out**: `CLAUDE_PLUGIN_SECRET_GUARD=off` (또는 `0`/`false`) 한 가지. 세션 단위·명시적.
+  우회 시 stderr 알림.
+- `docs/direction/2026-04-28-secret-file-guardrail-charter.md` — 본 보안 정책의 사용자 원문
+  요구·도출 원칙·설계 결정·미래 변경 가드레일을 보존하는 헌장.
+
+### Changed
+- `hooks/hooks.json` 에 `PreToolUse` 항목 신설 (matcher: `Read|Edit|Write|Bash`). 기존
+  `SessionStart` 3 훅(`bootstrap-local.sh`, `stack-watch.sh`, `knowledge-watch.sh`) 은 그대로.
+- 본 가드는 `permissions.deny` settings.json 을 ship 하지 *않는다*. 사용자
+  `settings.local.json` 우선순위가 plugin settings 보다 높아 *무조건 적용* 보장이
+  깨지기 때문(헌장 D12). 훅으로 일원화.
+
+### Migration (v0.6.x → v0.7.0)
+별도 작업 불필요. 머지 후 다음 세션부터 `PreToolUse` 가 자동 발효된다.
+- 기본 동작: `.env`, `.env.*` 접근 차단(`.env.example` 등 템플릿 예외).
+- 정책 커스터마이즈: `cp claude-code-plugin/project-lifecycle/hooks/secret-guard-template.json .claude/secret-guard.json` 로 시작 샘플을 복사한 뒤 편집. 다음 도구 호출부터 즉시 반영.
+- 일시 해제: `CLAUDE_PLUGIN_SECRET_GUARD=off claude` (세션 종료 시 자동 복원).
+
 ## [0.6.0] — 2026-04-28
 
 ### Added
