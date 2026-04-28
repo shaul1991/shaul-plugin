@@ -88,6 +88,16 @@ metadata:
 - **`.claude/tech-debt-registry.md`** — 기술 부채 기록부
 - **`.claude/kpi-definitions.md`** — 성공 지표 정의서
 
+### Step 6: knowledge 영역 권유 (v0.6.0+, 사용자 결정)
+
+> 자동 생성하지 않는다. 단지 *권유*만 한다. 헌장 D5 — 본 플러그인은 `.claude/knowledge/` 영역도, 루트 `AGENTS.md` 도 *자동으로 만들지 않는다*. 사용자가 `/knowledge` 를 직접 호출할 때만 등록된다.
+
+사용자에게 다음을 안내한다(이번 setup 에서는 등록하지 않아도 무방):
+
+> "신규 입사자 온보딩과 다른 AI 도구(Cursor·Codex·Copilot 등) 싱크를 위해 *사내 3종 문서(용어집·기획요구·기술요구)* 를 별도 묶음으로 관리할 수 있습니다. PRD/설계가 어느 정도 잡힌 이후에 `/knowledge` 로 등록하시면 됩니다. 등록 후에는 루트 `AGENTS.md` 로 *수동 승격*하면 다른 AI 도구도 도달할 수 있습니다(권장)."
+
+상세 절차는 `claude-code-plugin/project-lifecycle/skills/knowledge/SKILL.md` 와 헌장 `docs/direction/2026-04-28-three-doc-set-charter.md` 참조.
+
 > 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
 ## 가이드라인
