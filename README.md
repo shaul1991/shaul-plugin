@@ -104,6 +104,7 @@ shaul-plugin/
 - 📖 [`claude-code-plugin/project-lifecycle/README.md`](claude-code-plugin/project-lifecycle/README.md) — 플러그인 상세 매뉴얼
 - ⚙️ [`claude-code-plugin/project-lifecycle/skills/governance/SKILL.md`](claude-code-plugin/project-lifecycle/skills/governance/SKILL.md) — 거버넌스 4단계 프로세스 정의
 - 📂 [`claude-code-plugin/project-lifecycle/skills/governance/references/execution-plan-template.md`](claude-code-plugin/project-lifecycle/skills/governance/references/execution-plan-template.md) — 실행계획서 템플릿
+- 🧭 [`docs/direction/`](docs/direction/) — 플러그인 개발 방향성·요구사항·아키텍처 결정 영구 기록 (시간순, ADR 형식)
 
 ---
 
@@ -111,6 +112,7 @@ shaul-plugin/
 
 - 브랜치 네이밍은 `claude/<주제>` 또는 `feature/<주제>` 컨벤션을 따릅니다.
 - 작업 중 작성되는 실행계획은 자동으로 `.claude/local/plans/<branch>/...`에 저장되며 `.claude/` 폴더 전체 ignore의 일부로 git 추적에서 제외됩니다. 합의가 끝난 계획·산출물 중 팀과 공유가 필요한 것만 사용자가 직접 `.claude/` 밖(예: `docs/`)으로 이동시켜 추적 영역에 둡니다.
+- 사용자(저장소 오너)로부터 **플러그인 개발 방향성·요구사항·아키텍처 결정**을 새로 받았다면, 그 내용은 `docs/direction/`에 영구 기록을 남깁니다 (컨벤션은 [`docs/direction/README.md`](docs/direction/README.md) 참조). 구현 결과는 출시·CHANGELOG로, *왜 그렇게 만들었는가*는 이 디렉토리로 분리해 기록합니다.
 - `claude-code-plugin/project-lifecycle/` 하위(스킬·에이전트·훅·`plugin.json`)를 수정하면 마켓플레이스 매니페스트(`.claude-plugin/marketplace.json`)의 `version` 및 해당 plugin entry의 `version`을 함께 갱신합니다.
 - 사용자에게 영향을 주는 변경은 `CHANGELOG.md`에 항목을 추가합니다(Keep a Changelog 형식, SemVer).
 - PR을 올리기 전 `governance` 스킬의 재검증 체크리스트를 먼저 통과시키는 것을 권장합니다.
