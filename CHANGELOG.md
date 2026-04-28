@@ -4,6 +4,23 @@ All notable changes to the **project-lifecycle** Claude Code plugin are tracked
 here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- `.claude-plugin/marketplace.json` — 이 저장소를 Claude Code 플러그인
+  마켓플레이스로 노출. 사용자는 `/plugin marketplace add shaul1991/shaul-plugin`
+  → `/plugin install project-lifecycle@shaul-plugin` 으로 설치 가능.
+- README 설치 섹션을 마켓플레이스 / 로컬 마켓플레이스(개발용)
+  두 가지 경로로 정리.
+
+### Removed
+- `claude-code-plugin/project-lifecycle.plugin` — `.plugin` zip 아카이브.
+  마켓플레이스가 디렉토리 source(`./claude-code-plugin/project-lifecycle`)를
+  직접 사용하므로 더 이상 필요 없습니다. 과거 stale-archive 회귀의
+  진원지였습니다.
+- `scripts/build-plugin.sh` — 위 아카이브 재생성을 위한 단일 빌드 스크립트.
+- `.github/workflows/plugin-archive-check.yml` — 아카이브-소스 정합성 CI 가드.
+
 ## [0.3.1] — 2026-04-28
 
 ### Fixed
