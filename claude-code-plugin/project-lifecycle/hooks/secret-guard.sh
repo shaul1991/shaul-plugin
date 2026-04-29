@@ -18,6 +18,11 @@
 # Opt-out (per session, intentional):
 #   CLAUDE_PLUGIN_SECRET_GUARD=off (or 0/false) → bypass entirely + stderr alert.
 #
+# FAIL-CLOSED policy:
+#   When the guard cannot evaluate the policy (python3 missing, malformed
+#   stdin JSON), the request is DENIED — not silently allowed. Users can
+#   recover by installing python3 or by setting the opt-out env var.
+#
 # Categories in the policy file:
 #   - always_block      → permissionDecision="deny"   (highest priority)
 #   - ask_before_read   → permissionDecision="ask"    (user prompt)
@@ -28,6 +33,16 @@
 
 set -u
 
+# ---- Helper: emit a hand-crafted deny JSON when python3 is unavailable.
+emit_failsafe_deny() {
+  local reason="$1"
+  # Hand-craft minimal JSON; cannot rely on python3 here.
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}' "$reason"
+  echo "[project-lifecycle/secret-guard] DENY (fail-closed): $reason" >&2
+  echo "  복구: python3 설치, 또는 일시 해제 CLAUDE_PLUGIN_SECRET_GUARD=off" >&2
+  exit 2
+}
+
 # ---- 1. Opt-out check ---------------------------------------------------
 case "${CLAUDE_PLUGIN_SECRET_GUARD:-on}" in
   off|0|false|FALSE|False)
@@ -36,17 +51,19 @@ case "${CLAUDE_PLUGIN_SECRET_GUARD:-on}" in
     ;;
 esac
 
-# ---- 2. python3 availability -------------------------------------------
+# ---- 2. python3 availability (FAIL-CLOSED) ----------------------------
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "[project-lifecycle/secret-guard] python3 가 필요합니다 — 본 보안 가드는 비활성 상태로 진행합니다. 정책 강제를 위해 python3 설치를 권장합니다." >&2
-  exit 0
+  emit_failsafe_deny "secret-guard 실행에 필요한 python3 가 없어 정책 평가 불가 — fail-closed 정책에 따라 차단"
 fi
 
 # ---- 3. Read tool call JSON from stdin --------------------------------
 TOOL_JSON="$(cat)"
 
+if [ -z "$TOOL_JSON" ]; then
+  emit_failsafe_deny "stdin tool-call JSON 이 비어 있어 정책 평가 불가 — fail-closed"
+fi
+
 # ---- 4. Delegate decision to python3 ----------------------------------
-# Pass the tool JSON via env var so the heredoc stays clean (and stdin is free).
 SECRET_GUARD_TOOL_JSON="$TOOL_JSON" python3 <<'PY'
 import sys, json, os, fnmatch, shlex
 
@@ -81,12 +98,31 @@ def emit_and_exit(decision, category, basename):
         sys.exit(2)
     sys.exit(0)
 
+
+def emit_failclosed_deny_and_exit(reason):
+    """Fail-closed: deny + hand-crafted JSON + exit 2."""
+    out = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": f"fail-closed: {reason}",
+        }
+    }
+    sys.stdout.write(json.dumps(out, ensure_ascii=False))
+    sys.stdout.flush()
+    sys.stderr.write(f"[project-lifecycle/secret-guard] DENY (fail-closed): {reason}\n")
+    sys.stderr.write("  복구: 정책 파일 수정, 또는 일시 해제 CLAUDE_PLUGIN_SECRET_GUARD=off\n")
+    sys.exit(2)
+
+
 raw = os.environ.get("SECRET_GUARD_TOOL_JSON", "")
 try:
     tool = json.loads(raw)
 except Exception as exc:
-    sys.stderr.write(f"[project-lifecycle/secret-guard] stdin JSON 파싱 실패: {exc} — 가드 통과 처리\n")
-    sys.exit(0)
+    emit_failclosed_deny_and_exit(f"stdin JSON 파싱 실패: {exc}")
+
+if not isinstance(tool, dict):
+    emit_failclosed_deny_and_exit("stdin JSON 이 객체가 아님")
 
 tool_name = tool.get("tool_name") or ""
 tool_input = tool.get("tool_input") or {}
