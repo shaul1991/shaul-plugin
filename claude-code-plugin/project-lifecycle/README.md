@@ -40,6 +40,7 @@ Phase에 종속되지 않고 전체 라이프사이클에서 횡단적으로 호
 | `debt-collector` | "기술 부채 탐지", "부채 수집", "TODO 정리" | 코드 내 임시 방편(Workaround) 감지 → 부채 기록부 자동 등록 | `lead-developer` |
 | `gate-keeper` | "게이트 체크", "Go/No-Go", "단계 완료 판정" | Phase 종료 시 성공 기준 충족 판정 → 다음 단계 잠금 해제 | `quality-reviewer` |
 | `knowledge` (v0.6.0) | "용어집", "사내 용어", "온보딩 문서", "기획 요구", "기술 요구" | 사내 3종 문서(용어집·기획요구·기술요구)를 인덱스 + 3 산출물 lazy-load 구조로 관리. 루트 `AGENTS.md` 권장 승격 가이드 포함. | `domain-liaison` |
+| `codex-reviewer` (v0.8.0) | (사용자 트리거 없음 — 07-qa Step 0 디스패처가 호출) | 외부 OpenAI Codex CLI 를 Bash 로 호출해 Phase 산출물을 평가하는 *백엔드* 스킬. `quality-reviewer` 와 동일한 평가 프레임워크 사용. | (스킬 단독 — 전용 에이전트 없음) |
 
 ## 산출물 구조
 
@@ -228,6 +229,71 @@ CLAUDE_PLUGIN_SECRET_GUARD=off claude
 복구 경로: python3 설치, 정책 파일 수정, 또는 `CLAUDE_PLUGIN_SECRET_GUARD=off` 한시 우회.
 
 상세 원칙은 `docs/direction/2026-04-28-secret-file-guardrail-charter.md` 헌장을 참조하세요.
+
+## 리뷰 백엔드 선택 (v0.8.0)
+
+Phase 7 QA 리뷰를 어느 백엔드로 수행할지 사용자가 선택할 수 있습니다. **기본값은 `claude`** (인-프로세스 `quality-reviewer` 에이전트) — 정책 파일이 없으면 v0.7.x 와 정확히 동일하게 동작합니다.
+
+### 백엔드 선택지
+
+| `reviewer` | 동작 | 사전 조건 | 산출물 |
+|---|---|---|---|
+| `claude` | 세션 안에서 `quality-reviewer` 에이전트가 평가 (기존 v0.7.x 경로) | 없음 | `.claude/reviews/<phase>-claude-<ts>.md` |
+| `codex` | Bash 로 외부 `codex` CLI 호출 후 stdout 캡처 | `codex` 설치 + `codex login` | `.claude/reviews/<phase>-codex-<ts>.md` (헤더 5줄: backend·model·exit·ts·hash) |
+| `cross` | Claude → Codex 순차 실행 + 비교 파일 생성 | codex 설치 권장 (미설치 시 `claude` 만 실행 후 안내) | 위 두 파일 + `.claude/reviews/<phase>-cross-<ts>.md` (항목별 일치/불일치 표) |
+
+### 해석 우선순위
+
+`07-qa` 스킬 Step 0 디스패처가 다음 순서로 *resolved backend* 를 결정하고 한국어로 announce 합니다:
+
+1. 환경변수 `CLAUDE_PLUGIN_REVIEWER` (`claude` / `codex` / `cross`)
+2. `.claude/review-config.json` 의 `per_phase_overrides["07"]` → `reviewer`
+3. 내장 기본값 `claude`
+
+### 사용자 정책 — `.claude/review-config.json` (직접 편집)
+
+```json
+{
+  "schema_version": 1,
+  "reviewer": "claude",
+  "codex": {
+    "model": "",
+    "timeout_sec": 300,
+    "extra_flags": []
+  },
+  "per_phase_overrides": {}
+}
+```
+
+- 시작 샘플: `claude-code-plugin/project-lifecycle/hooks/review-config-template.json` 을 `.claude/review-config.json` 으로 복사 후 편집.
+- `codex.timeout_sec` 미지정 시 기본 300초. 환경변수 `CODEX_TIMEOUT` 으로도 일시 조정 가능.
+- `_writer_reserved` 키는 미래 PR 슬롯 (코드 작성 백엔드 분기). v0.8.0 에서는 미사용 — 무시하면 됩니다.
+
+### 일시 변경 (Opt-in)
+
+```bash
+CLAUDE_PLUGIN_REVIEWER=codex claude    # 이번 세션만 codex 백엔드
+CLAUDE_PLUGIN_REVIEWER=cross claude    # 이번 세션만 cross 백엔드
+CLAUDE_PLUGIN_REVIEWER=claude claude   # 정책 파일이 codex 여도 claude 강제
+```
+
+### Cross 모드 — 사람이 최종 판정
+
+두 백엔드의 판정이 다를 때 *자동 차단하지 않습니다*. 비교 파일에 두 결과를 나란히 보여주고, "사람의 최종 판정" 섹션을 사용자가 직접 채웁니다. 이는 LLM 비결정성과 두 모델의 강점이 다르다는 점을 인정하는 사용자 결정 정책입니다.
+
+### 시크릿 가드 상호작용
+
+`codex` 호출은 PreToolUse Bash 훅(secret-guard)을 그대로 통과합니다. 프롬프트는 `.claude/local/codex/<phase>-<ts>.prompt.md` 파일에 먼저 기록한 뒤 codex 에 *파일 경로/stdin* 으로 전달하므로(인라인 heredoc 금지), `.env` 류 토큰이 명령줄에 노출되지 않습니다. 프롬프트 본문에 시크릿이 포함되어 있다면 secret-guard 가 차단하며, 이는 정상 동작입니다 — 우회하지 마세요.
+
+### 실패 모드
+
+| 상황 | 동작 |
+|---|---|
+| `codex` 미설치 | "codex CLI 미설치 — Claude 리뷰로 폴백" 안내 후 `quality-reviewer` 자동 호출 |
+| 인증 누락 (stderr 에 `auth`/`login`) | 폴백 없이 중단. "`codex login` 후 재시도" 안내 (사용자 액션 필요) |
+| 타임아웃 | 중단 + Claude 폴백 권유. `CODEX_TIMEOUT` env 로 조정 가능 |
+| 그 외 비-제로 종료 | stderr 노출 후 사용자 판단 (재시도 / Claude 폴백 / 중단) |
+| Verdict 라인 누락 | 결과 파일 그대로 저장 + "사람이 직접 확인 필요" 경고 추가 |
 
 ## 기술 스택 등록 & 갱신 (v0.5.0)
 

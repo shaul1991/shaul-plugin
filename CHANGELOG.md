@@ -6,6 +6,56 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-04-29
+
+### Added — Review Backend Branching
+- **신규 스킬 `codex-reviewer`** (`skills/codex-reviewer/SKILL.md`).
+  외부 OpenAI Codex CLI 를 Bash 로 호출해 Phase 산출물을 평가하는 백엔드 스킬.
+  사용자 키워드 트리거 없음 — `07-qa` Step 0 디스패처가 `reviewer: "codex"` 또는
+  `"cross"` 일 때만 호출. 평가 프레임워크는 `quality-reviewer` 에이전트와 동일하게
+  사용해 두 백엔드의 판정이 비교 가능하도록 보존.
+  - 프롬프트는 *반드시 파일* (`.claude/local/codex/<phase>-<ts>.prompt.md`)로 전달 →
+    인라인 heredoc 경로의 secret-guard 토큰 차단 회피.
+  - 결과 파일 `.claude/reviews/<phase>-codex-<ts>.md` 헤더 5줄(backend/model/exit/ts/hash)
+    로 감사 재현성 확보.
+  - 명령어 라인은 한 줄에 모아 두고 TBD 라벨 — 설치된 `codex --help` 확인 후 정확한
+    verb/flag 로 교체 (스킬 안 한 곳만 고치면 됨).
+- **참고 자료 `skills/codex-reviewer/references/codex-prompt-template.md`** — codex 에
+  전달하는 평가 프롬프트 형식. Phase 별 체크리스트, cross-review 정합성 표,
+  `Verdict: Go|Iterate|No-Go` 출력 schema 강제.
+- **시작 샘플 `hooks/review-config-template.json`** — `.claude/review-config.json` 으로
+  복사해 편집할 수 있는 템플릿. 스키마 v1: `reviewer`(claude/codex/cross), `codex`
+  블록(model·timeout·extra_flags), `per_phase_overrides`, `_writer_reserved`(미래 PR 슬롯).
+- **`00-setup` SKILL Step 8 신설 — 리뷰 백엔드 정책 리뷰**. Phase 0 에서 사용자에게
+  (1) 백엔드 선택지(`claude`/`codex`/`cross`), (2) `command -v codex` 로 실제 설치 여부 탐지,
+  (3) 정책 파일 작성/보류 분기, (4) 우회 메커니즘(`CLAUDE_PLUGIN_REVIEWER` 환경변수) 을
+  명시적으로 안내. 사용자가 보류하면 정책 파일 미작성 — 내장 기본값 `claude` 적용.
+
+### Changed
+- **`07-qa` SKILL Step 0 신설 — 리뷰 백엔드 결정**. Phase 7 의 모든 평가 흐름 앞단에
+  디스패처를 배치. 해석 우선순위: `CLAUDE_PLUGIN_REVIEWER` 환경변수 → `.claude/review-config.json`
+  (`per_phase_overrides["07"]` 우선, 없으면 `reviewer`) → 내장 기본 `claude`. 결정된
+  백엔드를 사용자에게 한국어로 *반드시* announce. Phase 7 산출물 계약(`.claude/07-qa/`)
+  은 변경 없음 — 평가 결과 파일명만 백엔드별로 구분.
+- Cross 모드 정책 — 두 백엔드 결과를 나란히 보여주고 *사람이 최종 판정*. 자동 차단
+  없음(사용자 결정). 비교 파일 `.claude/reviews/<phase>-cross-<ts>.md` 에 항목별 일치/
+  불일치 표 + "사람의 최종 판정" 섹션.
+
+### Compatibility
+- **기본 동작 변경 없음** — 정책 파일·환경변수 모두 없으면 v0.7.0 과 동일하게
+  `quality-reviewer` 에이전트가 단독 실행.
+- **`agents/quality-reviewer.md` 변경 없음** — 디스패처는 스킬 레이어에 격리.
+- **`writer` 분기는 schema 만 예약**(`_writer_reserved`). `05-implementation` 스킬은
+  미수정. 다음 PR 에서 `writer: "codex"` 추가 시 기존 설정에 영향 없음.
+
+### Migration (v0.7.x → v0.8.0)
+별도 작업 불필요. 머지 후 다음 세션부터 `07-qa` 에 Step 0 이 자동 발효된다.
+- 정책 미설정: `quality-reviewer` 가 그대로 동작 (v0.7.0 과 동일).
+- 백엔드 변경: `cp claude-code-plugin/project-lifecycle/hooks/review-config-template.json .claude/review-config.json` 후 `reviewer` 값을 `codex` 또는 `cross` 로 편집.
+- 일시 변경: `CLAUDE_PLUGIN_REVIEWER=codex claude` 로 세션 시작.
+- Codex 사전 조건: `codex` CLI 설치 + `codex login`. 미설치/미인증 시 `claude` 로 자동 폴백
+  또는 명시적 중단(인증 누락은 사용자 액션 필요).
+
 ## [0.7.0] — 2026-04-28
 
 ### Added — Security

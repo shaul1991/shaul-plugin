@@ -141,6 +141,41 @@ metadata:
 
 > 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
+### Step 8: 리뷰 백엔드 정책 리뷰 (v0.8.0+)
+
+> Phase 7 QA 리뷰를 어느 백엔드로 수행할지 *지금 한 번* 정하면, 이후 모든 Phase 7 호출이 그 정책을 따른다. 정하지 않으면 *내장 기본값* (Claude 인-프로세스 `quality-reviewer` 에이전트) 이 그대로 적용된다. 헌장 — Claude 백엔드를 단일 경로로 강제하지 않고, 외부 도구와 교차 검증할 수 있는 선택지를 제공한다.
+
+#### 8-1. 백엔드 선택지 안내
+
+사용자에게 한국어로 다음을 *반드시 한 번* 안내한다:
+
+> "Phase 7 리뷰 백엔드를 다음 중에서 선택할 수 있습니다 (기본값 = `claude`, 추가 의존성 없음):
+>
+> - `claude` — 현재 세션 안에서 `quality-reviewer` 에이전트가 평가. 추가 설치 불필요.
+> - `codex` — 외부 OpenAI Codex CLI 호출. 사전 조건: `codex` 설치 + `codex login`. 시크릿 가드는 그대로 작동합니다.
+> - `cross` — Claude 먼저, 이어서 Codex 를 *순차* 실행. 두 판정을 나란히 보고 사람이 최종 결정합니다 (자동 차단 없음).
+>
+> ⚠️ 백엔드와 무관하게 `secret-guard` 정책은 모든 Bash 호출에 동일하게 적용됩니다 — codex 호출도 예외 없습니다.
+> ⚠️ 같은 산출물을 두 번 평가해도 LLM 비결정성으로 결과가 다를 수 있습니다."
+
+#### 8-2. Codex 설치 여부 탐지
+
+`command -v codex` 로 설치 여부를 *반드시 확인한다*. 결과에 따라 8-1 의 안내에 한 줄을 덧붙인다:
+
+- **설치됨** — "현재 환경에서 `codex` 가 발견되었습니다 (경로: `<which codex>`)."
+- **미설치** — "현재 환경에서 `codex` 가 발견되지 않았습니다. `codex` / `cross` 를 선택하면 Phase 7 호출 시 한국어 안내 후 자동으로 `claude` 로 폴백됩니다. 설치 후 사용하려면 OpenAI Codex CLI 공식 문서 참조."
+
+#### 8-3. 정책 파일 작성 분기
+
+- **사용자가 명시적으로 선택** → `claude-code-plugin/project-lifecycle/hooks/review-config-template.json` 을 시작점으로 `.claude/review-config.json` 을 작성한다. `reviewer` 값만 사용자 선택으로 교체하고, `$comment` / `$reviewer_options` / `$resolution_order` / `$example` 등 안내용 키는 *모두 제거*한다 (실제 정책 파일은 깔끔하게 유지). 작성 후 사용자에게 결과를 보여주고 *명시적 확인* 을 받는다.
+- **사용자가 결정 보류** → `.claude/review-config.json` 을 *만들지 않는다*. 내장 기본값 `claude` 가 적용된다. 사용자에게 한 줄 안내: "필요해지면 언제든 `.claude/review-config.json` 을 직접 생성·편집해서 백엔드를 변경할 수 있습니다."
+
+#### 8-4. 우회 메커니즘 인식 강화
+
+세팅 종료 직전 한 줄 더:
+
+> "정책을 일시적으로 바꾸려면 `CLAUDE_PLUGIN_REVIEWER=codex claude` 또는 `=cross` / `=claude` 로 세션을 시작하세요. 환경변수가 정책 파일보다 우선합니다. 세션 종료 시 자동 복원되며, 영구 변경은 `.claude/review-config.json` 에서만 합니다."
+
 ## 가이드라인
 
 - Phase 0은 다른 모든 Phase의 전제 조건이다 — 반드시 먼저 수행
@@ -154,4 +189,6 @@ metadata:
 - **`references/project-config-template.md`** — 프로젝트 설정 템플릿
 - **`references/team-conventions-template.md`** — 팀 컨벤션 정의 템플릿
 - **`../../hooks/secret-guard-template.json`** — Step 7-3 의 정책 작성 시작 샘플
+- **`../../hooks/review-config-template.json`** — Step 8-3 의 리뷰 백엔드 정책 시작 샘플
+- **`../codex-reviewer/SKILL.md`** — Step 8 에서 선택한 codex 백엔드의 실제 호출 스킬
 - **`../../../../docs/direction/2026-04-28-secret-file-guardrail-charter.md`** — Step 7 의 상위 헌장

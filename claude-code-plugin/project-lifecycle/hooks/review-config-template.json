@@ -1,0 +1,23 @@
+{
+  "$comment": "Copy this file to <project>/.claude/review-config.json and edit. The 07-qa Step 0 dispatcher reads it on each Phase 7 invocation. If the file is absent, the dispatcher applies the same default shown here ('reviewer': 'claude'). Override at runtime with env var CLAUDE_PLUGIN_REVIEWER=claude|codex|cross.",
+  "$resolution_order": "env var CLAUDE_PLUGIN_REVIEWER  >  this file  >  built-in default ('claude')",
+  "schema_version": 1,
+  "reviewer": "claude",
+  "$reviewer_options": "claude | codex | cross",
+  "codex": {
+    "$comment": "Used only when reviewer is 'codex' or 'cross'. The exact codex CLI invocation is TBD until verified against `codex --help`; the codex-reviewer skill keeps the command on a single line so flags can be adjusted without touching the dispatcher.",
+    "model": "",
+    "timeout_sec": 300,
+    "extra_flags": []
+  },
+  "per_phase_overrides": {
+    "$comment": "Optional. Per-phase reviewer override. Phase keys are '00' through '08'. Missing phases inherit the top-level 'reviewer'.",
+    "$example": {
+      "07": "cross"
+    }
+  },
+  "_writer_reserved": {
+    "$comment": "Reserved for a future PR. The 05-implementation skill currently ignores this key. Forward-compatible: existing setups that omit 'writer' continue to use Claude as the writer.",
+    "$future_options": "claude | codex"
+  }
+}

@@ -14,7 +14,8 @@
 - **SessionStart 자동 부트스트랩** — 사용자 프로젝트에서 세션이 시작되면 `.claude/local/plans/` 디렉토리와 `.gitignore` 처리가 자동으로 보장됩니다 (idempotent, git 저장소에서만 동작).
 - **사내 3종 문서 통합 관리 (v0.6.0)** — 신규 `knowledge` 스킬이 용어집·기획요구·기술요구를 인덱스(lazy-load) 한 묶음으로 관리합니다. 다른 AI 도구(Cursor·Codex·Copilot·Gemini 등) 도달이 필요하면 사용자가 인덱스를 루트 `AGENTS.md` 로 *수동 승격*(이동·심링크). 신규 `domain-liaison` 에이전트가 팀별·도메인 간 vocabulary 일관성을 책임집니다.
 - **시크릿 파일 가드 (v0.7.0)** — `Read`/`Edit`/`Write`/`Bash` 가 `.env`, `.env.*` 같은 시크릿 파일을 만지려 시도하면 *무조건* 차단(또는 사용자 확인 프롬프트). 어느 step·skill·에이전트에서도 동일 적용. 사용자가 `.claude/secret-guard.json` 한 파일만 편집해 정책을 추가·삭제 가능. 일시 해제는 `CLAUDE_PLUGIN_SECRET_GUARD` 환경변수에 `off`/`0`/`false`/`no` 중 하나(대소문자 무관) 설정. python3 부재·정책 평가 불가 시에는 *fail-closed*(기본 차단)로 동작.
-- **16개 스킬 + 15개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper`, `knowledge` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
+- **리뷰 백엔드 선택 (v0.8.0)** — Phase 7 QA 리뷰를 `claude` (인-프로세스 `quality-reviewer` 에이전트, 기본값) / `codex` (외부 OpenAI Codex CLI 호출) / `cross` (둘 다 순차 실행, 사람이 최종 판정) 중에서 선택. 정책은 `.claude/review-config.json` 한 파일로 관리하고, 일시 변경은 `CLAUDE_PLUGIN_REVIEWER` 환경변수로. Codex 미설치 시 자동으로 `claude` 폴백, 인증 누락 시 폴백 없이 중단(사용자 액션 필요). 두 백엔드는 동일한 평가 프레임워크를 공유해 cross 비교가 의미 있게 동작합니다.
+- **17개 스킬 + 15개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper`, `knowledge`, `codex-reviewer` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
 - **ALM 추적성** — `.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`로 요구사항·설계·코드·테스트·KPI의 연결을 관리. (공유가 필요하면 사용자가 직접 추적 영역으로 이동)
 
 ---
@@ -93,8 +94,8 @@ shaul-plugin/
         ├── README.md                         ← 상세 매뉴얼 (스킬·에이전트 카탈로그)
         ├── .claude-plugin/plugin.json
         ├── hooks/                            ← SessionStart 부트스트랩 스크립트
-        ├── agents/                           ← 14개 전문가 에이전트 정의
-        └── skills/                           ← 15개 스킬 정의 (Phase + 크로스커팅)
+        ├── agents/                           ← 15개 전문가 에이전트 정의
+        └── skills/                           ← 17개 스킬 정의 (Phase + 크로스커팅 + codex-reviewer 백엔드)
 ```
 
 ---
