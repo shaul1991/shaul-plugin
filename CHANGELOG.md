@@ -6,6 +6,95 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-04-29
+
+### Changed — Asset Classification 재정의 (BREAKING for v0.8.x adopters)
+- **`.claude/` = *Claude/플러그인 사용 설정 전용*, 모든 문서는 `docs/` 로
+  통일.** v0.8.0 의 *공유/운영/로컬 3계층* 패턴이 의미적으로는 명확했으나
+  (1) symlink 가 macOS/Linux 환경 의존, (2) `.claude/` 와 `docs/` 양쪽에
+  자산이 분산되어 *어디를 봐야 하는지* 혼란, (3) 운영 자산도 결국
+  *문서 형태* 라 docs/ 통합이 자연스러움 — 단순화.
+- **`.claude/` 잔류**: `CLAUDE.md`, `secret-guard.json`, `settings.json`
+  (+ `local/`, `settings.local.json` 로컬). 셋 다 *Claude Code/플러그인이
+  자동 로드하는 설정* — 문서 형태가 아님.
+- **`docs/` 카테고리** (사용자 결정, *권장* 매핑):
+  - `docs/knowledge/` — 사내 4종 (용어집·기획요구·기술요구·API흐름)
+  - `docs/architecture/` — Phase 3 산출물
+  - `docs/operations/` — Phase 8 산출물
+  - `docs/team/` — 프로젝트 메타·팀 컨벤션
+  - `docs/policies/` — Lightweight ADR
+  - `docs/alm/` — ALM 추적 자산 (lifecycle, tech-debt-registry,
+    kpi-definitions) **(NEW)**
+  - `docs/issues/` — 외부 트래커 대체 **(NEW)**
+- **symlink 패턴 폐기.** v0.8.0 의 `.claude/<원래>` → `docs/<새>` 호환
+  symlink 는 도입하지 않는다 (헌장 D3). 플러그인 step·skill·에이전트의
+  cross-ref 는 `docs/<name>` 로 직접.
+- **`.gitignore` 단순화**. negate 룰이 7~12 개에서 *3 개* 로 축소:
+  ```gitignore
+  .claude/*
+  !.claude/CLAUDE.md
+  !.claude/secret-guard.json
+  !.claude/settings.json
+  .claude/settings.local.json
+  ```
+
+### Added
+- `docs/direction/2026-04-29-claude-as-settings-only-charter.md` — 본
+  정책의 사용자 원문 요구·도출 원칙·설계 결정·미래 변경 가드레일을
+  보존하는 헌장. v0.8.0 헌장의 D3·D4 폐기 명시.
+- `references/asset-location-template.md` — 신규 분류표·신규 프로젝트
+  초기 셋업·기존 v0.8.x 마이그레이션 8단계·자주 묻는 질문 (NEW).
+
+### Changed
+- v0.8.0 헌장 `2026-04-29-three-tier-asset-charter.md` 상태를 *Superseded
+  by 2026-04-29-claude-as-settings-only-charter.md* 로 갱신. 분류 사유 등
+  대부분의 결정(D1·D2·D5·D9·D10·D12)은 본 v0.9.0 에서도 유효.
+- `00-setup` SKILL Step 8 재작성. 분류 원칙 안내 → 권장 분류표 → 의사
+  확인 → 마이그레이션 절차 → cross-reference 갱신 → 마무리 안내 6 단계.
+- `setup-coordinator` 행동 원칙 #6 갱신 (v0.8.0+ → v0.9.0+).
+- 플러그인 description 갱신. 키워드 변경: `three-tier-classification`,
+  `asset-promotion`, `gitignore-negate`, `symlink` 제거 → `asset-location`,
+  `config-vs-docs`, `claude-as-settings` 추가.
+
+### Migration (v0.8.x → v0.9.0)
+v0.8.0 의 *3계층 + symlink* 를 적용한 프로젝트의 마이그레이션. **자동
+실행 X** — 사용자가 명시적으로 진행.
+
+```bash
+# 1. 새 폴더
+mkdir -p docs/alm docs/issues
+
+# 2. 운영 자산 이동
+mv .claude/lifecycle.md docs/alm/lifecycle.md
+mv .claude/tech-debt-registry.md docs/alm/tech-debt-registry.md
+mv .claude/kpi-definitions.md docs/alm/kpi-definitions.md
+mv .claude/issues docs/issues
+
+# 3. 호환 symlink 제거
+cd .claude && rm -f 00-setup 03-architecture 08-maintenance policies knowledge && cd ..
+
+# 4. .gitignore 를 위 단순화 룰로 교체
+
+# 5. cross-reference 일괄 갱신 (sed 명령은 references 참조)
+
+# 6. .claude/CLAUDE.md ALM 표 재구성
+```
+
+상세 8단계는 `claude-code-plugin/project-lifecycle/skills/00-setup/references/asset-location-template.md` §"기존 v0.8.x 프로젝트의 마이그레이션" 참조.
+
+### Notes
+- **참조 구현**: pkpk-api(`atms-backend/api`) 가 v0.9.0 첫 적용 사례.
+  커밋 `b6e07a2` — 운영 자산 4종 docs/ 이동 + symlink 5개 폐기 +
+  cross-ref 8 파일 일괄 갱신. git 이 `mv` 를 *rename* 으로 자동 인식하여
+  history 보존됨.
+- **v0.7.x 이전 사용자** (`.claude/` 전체 차단)는 변경 없이 동작 가능.
+  하위 호환 보장.
+- **플러그인 내부 정합성**: 다른 phase SKILL 들의 `.claude/<x>/` 가정 은
+  본 릴리즈에서 *동시 갱신하지 않음*. 향후 라운드에서 점진 갱신 예정.
+  사용자 프로젝트가 v0.9.0 정책을 적용해도 *기존 SKILL 내부 참조* 는
+  심볼릭 링크 없이도 docs/ 위치를 찾을 수 있도록 SKILL 본문이 자율 동작
+  (예: 산출물을 *새로 작성* 시 `docs/<name>/<file>.md` 로 작성 권장).
+
 ## [0.8.0] — 2026-04-29
 
 ### Added — Asset Classification

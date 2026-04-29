@@ -141,87 +141,90 @@ metadata:
 
 > 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
-### Step 8: 사내 자산 3계층 분류 권유 (v0.8.0+, 사용자 결정)
+### Step 8: 자산 위치 정리 권유 (v0.9.0+, 사용자 결정)
 
-> 자동 승격하지 않는다. 단지 *권유*만 한다. 헌장 D6 — 본 플러그인은 `.claude/<name>` 디렉토리를 `docs/<name>` 으로 *자동 이동시키지 않는다*. 사용자가 명시 결정한 디렉토리만 옮긴다. 헌장 `2026-04-29-three-tier-asset-charter.md` 참조.
+> 자동 이동하지 않는다. 단지 *권유*만 한다. 헌장 D9 — 본 플러그인은 어떤 자산도 *자동으로 옮기지 않는다*. 사용자 명시 결정 후 명령 시퀀스를 따른다. 헌장 `2026-04-29-claude-as-settings-only-charter.md` 참조.
 
-#### 8-1. 분류 개요 안내
+#### 8-1. 분류 원칙 안내
 
 사용자에게 *반드시 한 번* 알린다:
 
-> "본 플러그인은 ALM 산출물을 3계층으로 분류합니다. 어떤 자산을 `docs/`(팀 공유) 로 승격할지, `.claude/` 에 남기되 git 추적할지(운영), 완전 로컬로 둘지는 *사용자 결정* 입니다. 자동 이동/추적은 하지 않습니다.
+> "본 플러그인은 자산을 *위치 의도* 로 분류합니다.
 >
-> - **공유 자산** → `docs/<name>/` (실체) + `.claude/<name>` 심볼릭 링크. git 추적 ON. 외부 협업·온보딩 가치 큰 *읽기 자료*.
-> - **운영 자산** → `.claude/` 직속 + `.gitignore` negate. git 추적 ON. 플러그인이 *작동을 위해 읽고 쓰는* 자산.
-> - **로컬 전용** → `.claude/local/`, `.claude/settings.local.json`. git 차단. 일시 작업·개인 설정.
+> - **`.claude/`** = *Claude/플러그인 사용 설정만*. `CLAUDE.md`(AI 컨텍스트), `secret-guard.json`(보안 정책), `settings.json`(Claude Code 공통). Claude Code/플러그인이 자동 로드하는 설정만 둡니다.
+> - **`docs/`** = *모든 문서*. ALM 추적·이슈·아키텍처·운영·정책·팀 컨벤션·지식 모두 `docs/` 의 의미별 하위 폴더에. 단일 진입점 — IDE 트리·GitHub UI 가시성.
+> - **`.claude/local/`, `.claude/settings.local.json`** = *로컬 전용*. 일시 작업·개인 설정. git 차단 유지.
 >
-> docs 와 .claude 양쪽에 사본을 두지 않습니다 — symlink 로 *단일 진실* 유지하여 sync drift 위험을 0 으로 만듭니다."
+> v0.8.0 의 symlink 패턴은 폐기되었습니다. `.claude/<원래>` → `docs/<새>` symlink 는 도입하지 않습니다 — 모든 참조는 `docs/<name>` 으로 직접."
 
 #### 8-2. 권장 분류표
 
-`references/three-tier-classification-template.md` 의 분류표를 그대로 사용자에게 제시한다. 핵심 매핑:
+`references/asset-location-template.md` 의 분류표를 그대로 사용자에게 제시한다. 핵심 매핑:
 
-| 산출물 | 권장 계층 | 권장 위치 |
-|--------|-----------|-----------|
-| knowledge (4종) | 공유 | `docs/knowledge/` (이미 v0.6.0 표준) |
-| 03-architecture | 공유 | `docs/architecture/` |
-| 08-maintenance | 공유 | `docs/operations/` |
-| 00-setup | 공유 | `docs/team/` |
-| policies | 공유 | `docs/policies/` |
-| `lifecycle.md`, `tech-debt-registry.md`, `kpi-definitions.md`, `issues/`, `secret-guard.json`, `settings.json`, `CLAUDE.md` | 운영 | `.claude/` (negate) |
-| `local/`, `settings.local.json` | 로컬 | `.claude/` (차단 유지) |
+| 산출물 | 위치 |
+|--------|------|
+| `CLAUDE.md`, `secret-guard.json`, `settings.json` | `.claude/` (잔류) |
+| `glossary.md`, `product-requirements.md`, `technical-requirements.md`, `index.md`, `api-flows/` | `docs/knowledge/` (이미 v0.6.0 표준) |
+| `tech-stack.md`, `system-design.md`, `data-model.md`, `api-spec.md` | `docs/architecture/` |
+| `monitoring-report.md`, `feedback-analysis.md`, `retrospective.md`, `incident-reports/` | `docs/operations/` |
+| `project-config.md`, `team-conventions.md` | `docs/team/` |
+| `decisions.md` (Lightweight ADR) | `docs/policies/` |
+| `lifecycle.md`, `tech-debt-registry.md`, `kpi-definitions.md` | `docs/alm/` (NEW v0.9.0) |
+| `issues/` (외부 트래커 대체) | `docs/issues/` (NEW v0.9.0) |
+| `local/`, `settings.local.json` | `.claude/` (차단 유지) |
 
-> ⚠️ **디렉토리명 자동 결정 금지** (헌장 D8). `00-setup → team`, `08-maintenance → operations` 는 *권장*. 사용자가 `setup`/`maintenance` 같은 다른 이름 선택 가능.
+> ⚠️ **디렉토리명 자동 결정 X** (헌장 D6). `alm`/`issues` 같은 카테고리 이름은 *권장*. 사용자가 다른 이름 선택 가능.
 
 #### 8-3. 사용자 의사 확인
 
 사용자에게 묻는다:
 
-> "공유 계층으로 승격할 디렉토리를 선택해 주세요. *지금 모두* 진행하셔도 되고, *PoC 1개부터* 시작하셔도 됩니다(예: `03-architecture` 만 먼저). 로컬 계층(`local/`, `settings.local.json`) 은 변경하지 않습니다."
+> "위 권장 분류 그대로 적용할까요? 아니면 일부 자산을 다른 위치(예: `lifecycle.md` 를 `.claude/` 에 그대로 두기)에 두고 싶으신가요? *모두 적용* 하면 명령 시퀀스를 제시하고, *부분 적용* 하면 어느 자산만 옮길지 알려주세요."
 
-#### 8-4. 승격 절차 (사용자 명시 결정 시)
+#### 8-4. 마이그레이션 절차 (사용자 명시 결정 시)
 
-사용자가 승격 결정한 디렉토리에 대해서만, `references/three-tier-classification-template.md` §"마이그레이션 명령 시퀀스" 의 패턴을 따른다:
+사용자가 결정한 자산에 대해서만, `references/asset-location-template.md` §"마이그레이션 명령 시퀀스" 의 패턴을 따른다:
 
 ```bash
-# 예: .claude/03-architecture → docs/architecture
-mv .claude/03-architecture docs/architecture
-ln -s ../docs/architecture .claude/03-architecture
+# 신규 docs/ 폴더 생성
+mkdir -p docs/alm docs/issues
 
-# .gitignore 수정 (와일드카드 차단 + 명시 negate; 헌장 D9)
+# 운영 자산 4종 이동 (예시 — 사용자가 동의한 자산만)
+mv .claude/lifecycle.md docs/alm/lifecycle.md
+mv .claude/tech-debt-registry.md docs/alm/tech-debt-registry.md
+mv .claude/kpi-definitions.md docs/alm/kpi-definitions.md
+mv .claude/issues docs/issues
+
+# .gitignore 단순화 (헌장 D7)
 # .claude/*
 # !.claude/CLAUDE.md
-# !.claude/lifecycle.md
-# ... (운영 자산)
-# !.claude/03-architecture     # symlink negate; 헌장 D10
-# .claude/settings.local.json  # 명시 차단
+# !.claude/secret-guard.json
+# !.claude/settings.json
+# .claude/settings.local.json
 ```
 
-> ⚠️ **Windows 호환성** (헌장 D11): symlink 미지원 환경에선 `mklink` 또는 `git config core.symlinks=true` 가 필요하다. 플러그인은 강제하지 않으니 사용자가 환경에 맞게 결정한다.
+> 신규 프로젝트라면 시작부터 위 구조로 생성하면 되어 *마이그레이션 자체가 불필요*하다. 본 절차는 *기존 v0.8.x 또는 그 이전* 프로젝트의 정리용.
 
-#### 8-5. 운영 자산 추적 활성화
+#### 8-5. cross-reference 갱신
 
-승격과 별도로, *운영 자산 7개* 의 `.gitignore` negate 룰은 *권장 default*:
+마이그레이션 후, *진입점 파일*(`.claude/CLAUDE.md`, `docs/alm/lifecycle.md`, `docs/policies/decisions.md` 등) 안의 `.claude/<옛경로>` 참조를 `docs/<새경로>` 로 갱신한다.
 
-```gitignore
-.claude/*
-!.claude/CLAUDE.md
-!.claude/lifecycle.md
-!.claude/tech-debt-registry.md
-!.claude/kpi-definitions.md
-!.claude/issues/
-!.claude/secret-guard.json
-!.claude/settings.json
-.claude/settings.local.json
+벌크 치환 예시 (macOS/Linux 의 BSD sed):
+
+```bash
+find docs -type f -name "*.md" -exec sed -i '' \
+  -e 's|\.claude/lifecycle\.md|docs/alm/lifecycle.md|g' \
+  -e 's|\.claude/tech-debt-registry\.md|docs/alm/tech-debt-registry.md|g' \
+  -e 's|\.claude/kpi-definitions\.md|docs/alm/kpi-definitions.md|g' \
+  -e 's|\.claude/issues|docs/issues|g' \
+  {} \;
 ```
 
-이 룰만으로도 *한 명 머신에만 존재하던 ADR·기술 부채* 가 팀 가시성 영역으로 이동한다(공유 계층 승격 없이도 적용 가능).
-
-> 사용자가 `.claude/` 전체 차단(v0.7.x 이전 default)을 유지하고 싶다면 위 룰을 적용하지 않으면 된다. 하위 호환은 깨지지 않는다.
+> ⚠️ sed 가 *문맥 의존* 표현(예: "X 는 Y 의 symlink") 을 손상시킬 수 있다. 치환 후 `grep -r '\.claude/' docs/` 로 잔존 참조를 점검 + 의미 손상 라인을 수동 복원.
 
 #### 8-6. 마무리 안내
 
-> "분류는 변경 가능합니다. 처음에 모두 `.claude/` 차단으로 두고, 필요할 때 본 절차를 다시 호출해서 단계적으로 승격해도 됩니다. 단, 승격된 자산을 다시 `.claude/` 로 되돌리는 것은 git history 가 분산되니 신중히 결정하세요."
+> "이제 `docs/` 가 *모든 문서의 단일 진입점* 입니다. 신규 합류자는 `docs/` 만 보면 충분합니다. `.claude/` 는 Claude/플러그인 작동 설정만 두므로 *팀이 직접 편집* 하는 일은 거의 없습니다 (`secret-guard.json` 정책 추가 같은 예외 케이스 외)."
 
 ## 가이드라인
 
@@ -235,7 +238,8 @@ ln -s ../docs/architecture .claude/03-architecture
 
 - **`references/project-config-template.md`** — 프로젝트 설정 템플릿
 - **`references/team-conventions-template.md`** — 팀 컨벤션 정의 템플릿
-- **`references/three-tier-classification-template.md`** — Step 8 분류표·마이그레이션 명령 시퀀스
+- **`references/asset-location-template.md`** — Step 8 분류표·마이그레이션 명령 시퀀스 (v0.9.0+)
 - **`../../hooks/secret-guard-template.json`** — Step 7-3 의 정책 작성 시작 샘플
 - **`../../../../docs/direction/2026-04-28-secret-file-guardrail-charter.md`** — Step 7 의 상위 헌장
-- **`../../../../docs/direction/2026-04-29-three-tier-asset-charter.md`** — Step 8 의 상위 헌장
+- **`../../../../docs/direction/2026-04-29-claude-as-settings-only-charter.md`** — Step 8 의 상위 헌장 (v0.9.0+)
+- **`../../../../docs/direction/2026-04-29-three-tier-asset-charter.md`** — Step 8 의 이전 헌장 (v0.8.0, *Superseded*. 분류 사유는 여전히 참고 가치)

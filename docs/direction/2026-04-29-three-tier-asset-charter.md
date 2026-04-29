@@ -3,9 +3,10 @@
 - **작성일**: 2026-04-29
 - **반영 출시**: v0.8.0
 - **관련 커밋**: (출시 시 추가)
-- **상태**: Active
+- **상태**: Superseded by `2026-04-29-claude-as-settings-only-charter.md`(v0.9.0)
 - **상위 헌장**: `2026-04-28-three-doc-set-charter.md`(v0.6.0), `2026-04-28-claude-output-charter.md`(v0.4.0)
 - **참조 구현**: pkpk-api (`atms-backend/api`) — 커밋 `dafcaf6`(api-flows 도입), `83c630b`(3계층 재편)
+- **대체 사유**: 본 헌장의 *three-tier* (공유/운영/로컬) 분류는 의미적으로 명확했으나, (1) symlink 패턴이 macOS/Linux 환경에 의존, (2) `.claude/` 와 `docs/` 양쪽에 자산이 분산되어 외부 도구·신규 합류자 입장에서 *어디를 봐야 하는지* 혼란, (3) 운영 자산(lifecycle/tech-debt/kpi/issues)도 결국 *문서 형태* 라 docs/ 로의 통합이 더 자연스러움. 후속 헌장(v0.9.0)에서 *.claude/ = 사용 설정만, docs/ = 모든 문서* 로 단순화. 본 헌장의 D1·D2·D5 (분류 자체)·D9·D10·D12 는 후속 헌장에서도 유효. D3 (symlink)·D4 (운영 자산 .claude/ 잔류) 는 폐기.
 
 ## 사용자 원문 요구사항
 

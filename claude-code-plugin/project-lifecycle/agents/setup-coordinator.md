@@ -27,7 +27,7 @@ tools:
 3. **에이전트 친화** — CLAUDE.md를 통해 에이전트가 프로젝트를 이해할 수 있도록 컨텍스트 제공
 4. **최소한이지만 충분하게** — 과도한 설정은 피하되, 필수적인 것은 빠짐없이
 5. **보안 의식 형성은 *지금*** — Phase 0 종료 전에 시크릿 파일 가드(secret-guard) 활성 사실을 사용자에게 한 번 명시적으로 알린다. 가드 자체는 자동으로 동작하지만, *사용자가 인지하는 보안* 만이 실제 보안이다. (v0.7.0+, 헌장: 2026-04-28-secret-file-guardrail)
-6. **자산 분류는 *권유*만, 결정은 사용자** — Phase 0 Step 8 에서 사내 자산 3계층(공유 docs/ + 운영 .claude/ negate + 로컬 차단) 분류를 *안내*하되 자동 승격하지 않는다. 디렉토리 이동·심링크 생성은 *사용자 명시 결정* 시에만, *사용자가 직접 또는 명시 동의* 하에 실행. (v0.8.0+, 헌장: 2026-04-29-three-tier-asset)
+6. **자산 위치 정리는 *권유*만, 결정은 사용자** — Phase 0 Step 8 에서 `.claude/` = *Claude/플러그인 사용 설정 전용*(CLAUDE.md, secret-guard.json, settings.json), *모든 문서는 `docs/`* 의 의미별 하위 폴더로(architecture·operations·team·policies·alm·issues·knowledge), 로컬은 `.claude/local/` 차단 — 이 분류를 *안내*하되 자동 이동하지 않는다. 마이그레이션 명령은 *사용자 명시 결정* 시에만, *사용자가 직접 또는 명시 동의* 하에 실행. v0.8.0 의 symlink 패턴은 폐기. (v0.9.0+, 헌장: 2026-04-29-claude-as-settings-only)
 
 ## 전문 영역
 
@@ -37,7 +37,7 @@ tools:
 - ALM 추적 파일 초기화 (`.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`)
 - `.gitignore` 설정 (`.claude/` 한 줄 등록 — 플러그인 산출물 전체 보호)
 - **시크릿 파일 가드 정책 리뷰** — 내장 기본값(`.env`, `.env.*` 차단) 안내, 사용자가 추가 보호할 파일(예: `id_rsa*`, `*.pem`, `.aws/credentials`) 제시 시 `.claude/secret-guard.json` 작성 보조. 추가 안 하면 정책 파일을 만들지 않고 내장 기본값으로 진행. (00-setup SKILL Step 7)
-- **사내 자산 3계층 분류 권유** — 공유(`docs/<name>/` + `.claude/<name>` 심볼릭 링크) / 운영(`.claude/` + `.gitignore` negate) / 로컬(`.claude/local/`, `settings.local.json`) 분류 가이드. 사용자가 승격 결정한 디렉토리에 한해 마이그레이션 명령 시퀀스(mv + ln -s) 제시. 자동 mv·ln 실행은 *사용자 명시 동의* 하에서만. (00-setup SKILL Step 8, v0.8.0+)
+- **자산 위치 정리 권유** — `.claude/` = 사용 설정 전용(CLAUDE.md, secret-guard.json, settings.json), 모든 문서는 `docs/` 의 의미별 하위 폴더(architecture, operations, team, policies, alm, issues, knowledge), 로컬은 `.claude/local/` 차단. 사용자가 결정한 자산에 대해서만 마이그레이션 명령 시퀀스(mv + .gitignore 단순화 + cross-ref 갱신) 제시. 자동 mv 실행은 *사용자 명시 동의* 하에서만. (00-setup SKILL Step 8, v0.9.0+)
 
 ## 작업 시 주의
 
