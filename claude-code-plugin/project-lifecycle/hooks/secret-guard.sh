@@ -65,7 +65,7 @@ fi
 
 # ---- 4. Delegate decision to python3 ----------------------------------
 SECRET_GUARD_TOOL_JSON="$TOOL_JSON" python3 <<'PY'
-import sys, json, os, fnmatch, shlex
+import sys, json, os, fnmatch, re
 
 DEFAULTS = {
     "schema_version": 1,
@@ -212,7 +212,11 @@ def evaluate(name):
         return ("ask", "ask_before_read")
     return (None, None)
 
-# Determine the set of basenames to evaluate
+# ---- Extract candidate basenames from the tool call ----
+# Bash tokens are split aggressively to neutralize embedded shell separators
+# like `;`, `|`, `&`, redirections, parentheses, equals, and commas.
+SEPARATOR_RE = re.compile(r"[^<>|&;()=,\s\"']+")
+
 candidates = []
 if tool_name in ("Read", "Edit", "Write"):
     fp = tool_input.get("file_path") or tool_input.get("notebook_path") or ""
@@ -220,15 +224,11 @@ if tool_name in ("Read", "Edit", "Write"):
         candidates.append(basename(fp))
 elif tool_name == "Bash":
     cmd = tool_input.get("command") or ""
-    try:
-        tokens = shlex.split(cmd, posix=True)
-    except ValueError:
-        tokens = cmd.split()
-    for tok in tokens:
-        for piece in tok.replace("=", " ").replace(",", " ").split():
-            piece = piece.lstrip("<>|&;()")
-            if piece:
-                candidates.append(basename(piece))
+    # Walk every word fragment delimited by shell metacharacters. This catches
+    # `cat .env;rm`, `cat .env|tee /tmp/x`, `KEY=$(cat .env)`, etc.
+    for piece in SEPARATOR_RE.findall(cmd):
+        if piece:
+            candidates.append(basename(piece))
 else:
     sys.exit(0)
 
