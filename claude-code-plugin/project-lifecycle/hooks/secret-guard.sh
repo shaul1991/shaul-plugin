@@ -74,6 +74,8 @@ DEFAULTS = {
     "exempt_suffixes": [".example", ".sample", ".template", ".dist"],
 }
 
+SUPPORTED_SCHEMA_VERSIONS = {1}
+
 def emit_and_exit(decision, category, basename):
     out = {
         "hookSpecificOutput": {
@@ -128,19 +130,58 @@ tool_name = tool.get("tool_name") or ""
 tool_input = tool.get("tool_input") or {}
 cwd = tool.get("cwd") or os.getcwd()
 
+
+def coerce_string_list(value, field_name):
+    """Validate value is a list of strings (or a single string).
+    Returns (normalized_list, error_msg_or_None)."""
+    if isinstance(value, str):
+        return ([value], None)
+    if not isinstance(value, list):
+        return (None, f"{field_name} must be a list of strings (got {type(value).__name__})")
+    out = []
+    for i, item in enumerate(value):
+        if not isinstance(item, str):
+            return (
+                None,
+                f"{field_name}[{i}] must be string (got {type(item).__name__})",
+            )
+        out.append(item)
+    return (out, None)
+
+
 # Load policy (cwd/.claude/secret-guard.json) or fall back to defaults
-policy = DEFAULTS
+policy = dict(DEFAULTS)
 policy_path = os.path.join(cwd, ".claude", "secret-guard.json")
 if os.path.exists(policy_path):
     try:
         with open(policy_path, "r", encoding="utf-8") as fp:
             user = json.load(fp)
-        policy = {
-            "schema_version": user.get("schema_version", 1),
-            "always_block": list(user.get("always_block", DEFAULTS["always_block"])),
-            "ask_before_read": list(user.get("ask_before_read", DEFAULTS["ask_before_read"])),
-            "exempt_suffixes": list(user.get("exempt_suffixes", DEFAULTS["exempt_suffixes"])),
-        }
+        if not isinstance(user, dict):
+            raise ValueError("policy root must be an object")
+
+        sv = user.get("schema_version", 1)
+        if not isinstance(sv, int) or sv not in SUPPORTED_SCHEMA_VERSIONS:
+            # Unsupported schema → discard the entire user policy and fall back
+            # to built-in defaults (the user-provided field shapes may not even
+            # be valid for this schema). Safe by construction.
+            sys.stderr.write(
+                f"[project-lifecycle/secret-guard] {policy_path}: unsupported schema_version "
+                f"({sv!r}) — 정책 전체를 내장 기본값으로 폴백\n"
+            )
+            # policy already == dict(DEFAULTS); skip per-field processing
+        else:
+            policy["schema_version"] = sv
+            for field in ("always_block", "ask_before_read", "exempt_suffixes"):
+                if field not in user:
+                    continue
+                normalized, err = coerce_string_list(user[field], field)
+                if err is not None:
+                    sys.stderr.write(
+                        f"[project-lifecycle/secret-guard] {policy_path}: {err} — 해당 필드는 내장 기본값 적용\n"
+                    )
+                    # leave policy[field] = DEFAULTS[field]
+                else:
+                    policy[field] = normalized
     except Exception as exc:
         sys.stderr.write(
             f"[project-lifecycle/secret-guard] {policy_path} 파싱 실패 — 내장 기본값 적용: {exc}\n"
