@@ -118,10 +118,12 @@ metadata:
 > - 항상 차단할 파일(`always_block`) — 추가 후 차단 즉시 적용
 > - 읽기 전 사용자 확인이 필요한 파일(`ask_before_read`) — 추가 후 도구 호출 시 인라인 프롬프트
 >
-> 흔한 후보:
+> ⚠️ **basename 매칭 주의**: `secret-guard.sh` 는 *파일명만*(경로 접두사 제외) 매칭합니다. `.aws/credentials` 가 아니라 `credentials` 처럼 *basename* 으로 입력해야 동작합니다(`secret-guard-template.json` 의 `$matching_note` 와 헌장 D7 참조).
+>
+> 흔한 후보(모두 basename 형식):
 > - SSH 키: `id_rsa`, `id_rsa.*`, `id_ed25519`, `id_ed25519.*`
 > - 인증서·키: `*.pem`, `*.key`, `*.p12`, `*.pfx`
-> - 클라우드 자격 증명: `.aws/credentials`, `.gcloud/credentials*.json`, `gcp-key*.json`
+> - 클라우드 자격 증명: `credentials`, `credentials*.json`, `gcp-key*.json`
 > - 패키지 매니저 토큰: `.npmrc`, `.netrc`, `.yarnrc`
 >
 > 추가하고 싶으면 어느 카테고리에 어떤 패턴을 넣을지 알려주세요. 추가하지 않으면 *내장 기본값으로* 진행합니다."
