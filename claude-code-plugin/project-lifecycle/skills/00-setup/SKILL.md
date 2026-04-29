@@ -141,6 +141,88 @@ metadata:
 
 > 참고: `.editorconfig` 자동 생성은 v0.4.0에서 제거되었다. 에디터 설정은 프로젝트 루트에 있어야 의미가 있고, 이는 "루트는 프로젝트 코드만"이라는 원칙과 충돌하기 때문이다. 필요하면 사용자가 직접 루트에 생성한다 — 샘플 스니펫은 `references/team-conventions-template.md` 참조.
 
+### Step 8: 사내 자산 3계층 분류 권유 (v0.8.0+, 사용자 결정)
+
+> 자동 승격하지 않는다. 단지 *권유*만 한다. 헌장 D6 — 본 플러그인은 `.claude/<name>` 디렉토리를 `docs/<name>` 으로 *자동 이동시키지 않는다*. 사용자가 명시 결정한 디렉토리만 옮긴다. 헌장 `2026-04-29-three-tier-asset-charter.md` 참조.
+
+#### 8-1. 분류 개요 안내
+
+사용자에게 *반드시 한 번* 알린다:
+
+> "본 플러그인은 ALM 산출물을 3계층으로 분류합니다. 어떤 자산을 `docs/`(팀 공유) 로 승격할지, `.claude/` 에 남기되 git 추적할지(운영), 완전 로컬로 둘지는 *사용자 결정* 입니다. 자동 이동/추적은 하지 않습니다.
+>
+> - **공유 자산** → `docs/<name>/` (실체) + `.claude/<name>` 심볼릭 링크. git 추적 ON. 외부 협업·온보딩 가치 큰 *읽기 자료*.
+> - **운영 자산** → `.claude/` 직속 + `.gitignore` negate. git 추적 ON. 플러그인이 *작동을 위해 읽고 쓰는* 자산.
+> - **로컬 전용** → `.claude/local/`, `.claude/settings.local.json`. git 차단. 일시 작업·개인 설정.
+>
+> docs 와 .claude 양쪽에 사본을 두지 않습니다 — symlink 로 *단일 진실* 유지하여 sync drift 위험을 0 으로 만듭니다."
+
+#### 8-2. 권장 분류표
+
+`references/three-tier-classification-template.md` 의 분류표를 그대로 사용자에게 제시한다. 핵심 매핑:
+
+| 산출물 | 권장 계층 | 권장 위치 |
+|--------|-----------|-----------|
+| knowledge (4종) | 공유 | `docs/knowledge/` (이미 v0.6.0 표준) |
+| 03-architecture | 공유 | `docs/architecture/` |
+| 08-maintenance | 공유 | `docs/operations/` |
+| 00-setup | 공유 | `docs/team/` |
+| policies | 공유 | `docs/policies/` |
+| `lifecycle.md`, `tech-debt-registry.md`, `kpi-definitions.md`, `issues/`, `secret-guard.json`, `settings.json`, `CLAUDE.md` | 운영 | `.claude/` (negate) |
+| `local/`, `settings.local.json` | 로컬 | `.claude/` (차단 유지) |
+
+> ⚠️ **디렉토리명 자동 결정 금지** (헌장 D8). `00-setup → team`, `08-maintenance → operations` 는 *권장*. 사용자가 `setup`/`maintenance` 같은 다른 이름 선택 가능.
+
+#### 8-3. 사용자 의사 확인
+
+사용자에게 묻는다:
+
+> "공유 계층으로 승격할 디렉토리를 선택해 주세요. *지금 모두* 진행하셔도 되고, *PoC 1개부터* 시작하셔도 됩니다(예: `03-architecture` 만 먼저). 로컬 계층(`local/`, `settings.local.json`) 은 변경하지 않습니다."
+
+#### 8-4. 승격 절차 (사용자 명시 결정 시)
+
+사용자가 승격 결정한 디렉토리에 대해서만, `references/three-tier-classification-template.md` §"마이그레이션 명령 시퀀스" 의 패턴을 따른다:
+
+```bash
+# 예: .claude/03-architecture → docs/architecture
+mv .claude/03-architecture docs/architecture
+ln -s ../docs/architecture .claude/03-architecture
+
+# .gitignore 수정 (와일드카드 차단 + 명시 negate; 헌장 D9)
+# .claude/*
+# !.claude/CLAUDE.md
+# !.claude/lifecycle.md
+# ... (운영 자산)
+# !.claude/03-architecture     # symlink negate; 헌장 D10
+# .claude/settings.local.json  # 명시 차단
+```
+
+> ⚠️ **Windows 호환성** (헌장 D11): symlink 미지원 환경에선 `mklink` 또는 `git config core.symlinks=true` 가 필요하다. 플러그인은 강제하지 않으니 사용자가 환경에 맞게 결정한다.
+
+#### 8-5. 운영 자산 추적 활성화
+
+승격과 별도로, *운영 자산 7개* 의 `.gitignore` negate 룰은 *권장 default*:
+
+```gitignore
+.claude/*
+!.claude/CLAUDE.md
+!.claude/lifecycle.md
+!.claude/tech-debt-registry.md
+!.claude/kpi-definitions.md
+!.claude/issues/
+!.claude/secret-guard.json
+!.claude/settings.json
+.claude/settings.local.json
+```
+
+이 룰만으로도 *한 명 머신에만 존재하던 ADR·기술 부채* 가 팀 가시성 영역으로 이동한다(공유 계층 승격 없이도 적용 가능).
+
+> 사용자가 `.claude/` 전체 차단(v0.7.x 이전 default)을 유지하고 싶다면 위 룰을 적용하지 않으면 된다. 하위 호환은 깨지지 않는다.
+
+#### 8-6. 마무리 안내
+
+> "분류는 변경 가능합니다. 처음에 모두 `.claude/` 차단으로 두고, 필요할 때 본 절차를 다시 호출해서 단계적으로 승격해도 됩니다. 단, 승격된 자산을 다시 `.claude/` 로 되돌리는 것은 git history 가 분산되니 신중히 결정하세요."
+
 ## 가이드라인
 
 - Phase 0은 다른 모든 Phase의 전제 조건이다 — 반드시 먼저 수행
@@ -153,5 +235,7 @@ metadata:
 
 - **`references/project-config-template.md`** — 프로젝트 설정 템플릿
 - **`references/team-conventions-template.md`** — 팀 컨벤션 정의 템플릿
+- **`references/three-tier-classification-template.md`** — Step 8 분류표·마이그레이션 명령 시퀀스
 - **`../../hooks/secret-guard-template.json`** — Step 7-3 의 정책 작성 시작 샘플
 - **`../../../../docs/direction/2026-04-28-secret-file-guardrail-charter.md`** — Step 7 의 상위 헌장
+- **`../../../../docs/direction/2026-04-29-three-tier-asset-charter.md`** — Step 8 의 상위 헌장

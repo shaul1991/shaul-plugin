@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "SHAUL의 Claude Code 플러그인 마켓플레이스. 프로젝트 라이프사이클 거버넌스를 제공하는 project-lifecycle 플러그인을 배포합니다.",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "homepage": "https://github.com/shaul1991/shaul-plugin",
     "repository": "https://github.com/shaul1991/shaul-plugin"
   },
@@ -14,8 +14,8 @@
     {
       "name": "project-lifecycle",
       "source": "./claude-code-plugin/project-lifecycle",
-      "description": "프로젝트 전체 라이프사이클(초기 설정 → 아이디어 → 기획 → 설계 → 디자인 → 구현 → 인프라 → QA → 운영/회고)을 단계별로 가이드. Plan-Review-Execute-Reverify 거버넌스, 브랜치별 실행계획 격리, 사용자 입력 기반 다중 프로젝트 기술 스택 등록·갱신(.claude/local/stack.json), 사내 3종 문서(용어집·기획요구·기술요구) 통합 관리(.claude/knowledge/) + 도메인 연락관 에이전트, .env/.env.* 등 시크릿 파일 PreToolUse 가드(.claude/secret-guard.json 사용자 정책 + 내장 기본값), SessionStart 변경 감지(매니페스트·knowledge), 16개 스킬과 15개 전문가 에이전트를 포함합니다.",
-      "version": "0.7.0",
+      "description": "프로젝트 전체 라이프사이클(초기 설정 → 아이디어 → 기획 → 설계 → 디자인 → 구현 → 인프라 → QA → 운영/회고)을 단계별로 가이드. Plan-Review-Execute-Reverify 거버넌스, 브랜치별 실행계획 격리, 사용자 입력 기반 다중 프로젝트 기술 스택 등록·갱신(.claude/local/stack.json), 사내 3종 문서(용어집·기획요구·기술요구) 통합 관리(.claude/knowledge/) + 도메인 연락관 에이전트, .env/.env.* 등 시크릿 파일 PreToolUse 가드(.claude/secret-guard.json 사용자 정책 + 내장 기본값), v0.8.0 부터 00-setup Step 8 에서 사내 자산 3계층 분류(공유 docs/ + 운영 .claude/ negate + 로컬 차단) 권유와 .claude/<name> 호환 심볼릭 링크 패턴을 제공, SessionStart 변경 감지(매니페스트·knowledge), 16개 스킬과 15개 전문가 에이전트를 포함합니다.",
+      "version": "0.8.0",
       "author": {
         "name": "SHAUL"
       },
@@ -48,7 +48,11 @@
         "security",
         "secret-guard",
         "pretooluse",
-        "dotenv"
+        "dotenv",
+        "three-tier-classification",
+        "asset-promotion",
+        "gitignore-negate",
+        "symlink"
       ],
       "category": "productivity"
     }

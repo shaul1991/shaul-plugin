@@ -6,6 +6,82 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-04-29
+
+### Added — Asset Classification
+- **사내 자산 3계층 분류 (`00-setup` Step 8 신설).** ALM 산출물을
+  *공유 자산* / *운영 자산* / *로컬 전용* 3 계층으로 분류하는
+  표준 가이드. v0.7.x 까지의 `.claude/` 전체 차단 패턴은 *그대로 유지
+  가능* (하위 호환). 적극 활용을 원하는 팀에 한해 권장:
+  - **공유 자산** → `docs/<name>/` (실체) + `.claude/<name>` 심볼릭 링크.
+    git 추적 ON. 외부 협업·온보딩 가치 큰 *읽기 자료* (architecture,
+    operations, team, policies, knowledge).
+  - **운영 자산** → `.claude/` 직속 + `.gitignore` negate 룰. git 추적
+    ON. 플러그인이 *작동을 위해 읽고 쓰는* 자산 (lifecycle.md,
+    tech-debt-registry.md, kpi-definitions.md, issues/, secret-guard.json,
+    settings.json, CLAUDE.md).
+  - **로컬 전용** → `.claude/local/`, `.claude/settings.local.json`.
+    git 차단 유지. 일시 작업·개인 설정.
+- **신규 참조 템플릿
+  `references/three-tier-classification-template.md`** — 분류표,
+  마이그레이션 명령 시퀀스(mv + ln -s), `.gitignore` 패턴 시작 샘플,
+  자주 묻는 질문.
+- `docs/direction/2026-04-29-three-tier-asset-charter.md` — 본 분류 정책의
+  사용자 원문 요구·도출 원칙·설계 결정·미래 변경 가드레일을 보존하는 헌장.
+- **참조 구현**: pkpk-api(`atms-backend/api`) 프로젝트가 첫 적용 사례.
+  - 4 디렉토리 승격 (`03-architecture` → `architecture`, `08-maintenance`
+    → `operations`, `00-setup` → `team`, `policies` 동명).
+  - 7 운영 자산 negate 추적 활성화.
+  - 5 호환 심볼릭 링크 (`mode 120000` 으로 git 정상 추적 검증).
+  - 0 sync drift (단일 진실 + symlink).
+
+### Changed
+- **`00-setup` SKILL Step 8 신설.** 분류 안내 → 권장 매핑 → 의사 확인
+  → 승격 절차 → 운영 자산 추적 활성화 → 마무리 안내 6 단계로 구성.
+  자동 승격은 *하지 않는다* (헌장 D6) — 사용자가 명시 결정한 디렉토리만
+  옮긴다.
+- 플러그인 description 갱신 — v0.8.0 의 3계층 분류 한 줄 추가.
+- 키워드 추가: `three-tier-classification`, `asset-promotion`,
+  `gitignore-negate`, `symlink`.
+
+### Migration (v0.7.x → v0.8.0)
+별도 작업 *불필요*. 머지 후 신규 프로젝트의 `00-setup` 호출 시 Step 8 이
+자동 안내된다. 기존 프로젝트는 자발적 승격 시점에 다음 절차:
+
+```bash
+# 예: .claude/03-architecture → docs/architecture (4 디렉토리 모두 동일 패턴)
+mv .claude/03-architecture docs/architecture
+ln -s ../docs/architecture .claude/03-architecture
+
+# .gitignore 룰 교체 (.claude/ 한 줄 → 와일드카드 + 명시 negate)
+# .claude/*
+# !.claude/CLAUDE.md
+# !.claude/lifecycle.md
+# !.claude/tech-debt-registry.md
+# !.claude/kpi-definitions.md
+# !.claude/issues/
+# !.claude/secret-guard.json
+# !.claude/settings.json
+# !.claude/00-setup
+# !.claude/03-architecture
+# !.claude/08-maintenance
+# !.claude/policies
+# !.claude/knowledge
+# .claude/settings.local.json
+```
+
+상세 가이드는
+`claude-code-plugin/project-lifecycle/skills/00-setup/references/three-tier-classification-template.md`
+참조.
+
+### Notes
+- **하위 호환 보장.** v0.7.x 이전의 `.claude/` 전체 차단 사용자는
+  변경 없이 동작. 본 분류는 *opt-in*.
+- **자동 마이그레이션 스크립트 ship X** (헌장 D7). 사용자 영역 침범
+  회피 — 명령 시퀀스 *제시*만.
+- **Windows 호환성** (헌장 D11). symlink 미지원 환경에선 `mklink /D`
+  또는 `git config core.symlinks=true` 가 필요. 플러그인은 강제하지 않음.
+
 ## [0.7.0] — 2026-04-28
 
 ### Added — Security
