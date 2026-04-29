@@ -16,7 +16,7 @@
 # Charter: docs/direction/2026-04-28-secret-file-guardrail-charter.md
 #
 # Opt-out (per session, intentional):
-#   CLAUDE_PLUGIN_SECRET_GUARD=off (or 0/false) → bypass entirely + stderr alert.
+#   CLAUDE_PLUGIN_SECRET_GUARD=off|0|false|no  (case-insensitive)
 #
 # FAIL-CLOSED policy:
 #   When the guard cannot evaluate the policy (python3 missing, malformed
@@ -43,10 +43,12 @@ emit_failsafe_deny() {
   exit 2
 }
 
-# ---- 1. Opt-out check ---------------------------------------------------
-case "${CLAUDE_PLUGIN_SECRET_GUARD:-on}" in
-  off|0|false|FALSE|False)
-    echo "[project-lifecycle/secret-guard] disabled via CLAUDE_PLUGIN_SECRET_GUARD" >&2
+# ---- 1. Opt-out check (case-insensitive) -------------------------------
+GUARD_VALUE="${CLAUDE_PLUGIN_SECRET_GUARD:-on}"
+GUARD_VALUE_LC="$(printf '%s' "$GUARD_VALUE" | tr '[:upper:]' '[:lower:]')"
+case "$GUARD_VALUE_LC" in
+  off|0|false|no)
+    echo "[project-lifecycle/secret-guard] disabled via CLAUDE_PLUGIN_SECRET_GUARD=$GUARD_VALUE" >&2
     exit 0
     ;;
 esac

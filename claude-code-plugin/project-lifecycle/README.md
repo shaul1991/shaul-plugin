@@ -215,7 +215,17 @@ PLAN (실행계획서 작성) → REVIEW (사용자 검증/수락) → EXECUTE (
 CLAUDE_PLUGIN_SECRET_GUARD=off claude
 ```
 
+허용 값(대소문자 무관): `off`, `0`, `false`, `no`. 그 외 모든 값은 활성으로 간주.
 세션 단위·명시적·트레이스 가능. 우회 시 stderr 에 알림 한 줄. 세션 종료 시 자동 복원.
+
+### Fail-closed 동작
+
+다음 상황에서는 *허용이 아닌 차단*(deny + exit 2) 으로 폐쇄적으로 동작합니다 — 보안 가드는 평가 불가 시 안전한 쪽을 택합니다:
+- 시스템에 `python3` 가 없을 때
+- stdin 의 tool-call JSON 이 비어있거나 파싱 실패
+- 정책 파일(`.claude/secret-guard.json`) 자체 파싱 실패는 *내장 기본값으로 폴백*(fail-closed 아님 — 안전 기본값이 있어서). 단 *필드 타입 오류*(예: `always_block: "string"`)는 해당 필드만 기본값으로 폴백.
+
+복구 경로: python3 설치, 정책 파일 수정, 또는 `CLAUDE_PLUGIN_SECRET_GUARD=off` 한시 우회.
 
 상세 원칙은 `docs/direction/2026-04-28-secret-file-guardrail-charter.md` 헌장을 참조하세요.
 
