@@ -30,7 +30,7 @@ metadata:
 
 | 문서 (Source of Truth) | 코드/구현 | 검증 포인트 |
 |----------------------|----------|------------|
-| `.claude/03-architecture/api-spec.md` | 실제 API 라우트/핸들러 | 엔드포인트 URL, 메서드, 파라미터, 응답 형태 |
+| `.claude/03-architecture/api-spec.md` | 실제 API 라우트/핸들러 | 엔드포인트 존재 여부 (URL + Method) 만. request/response 스키마·파라미터는 코드를 단일 진실로 보고 비교하지 않는다 |
 | `.claude/03-architecture/data-model.md` | DB 스키마/마이그레이션 | 테이블명, 컬럼, 타입, 관계, 인덱스 |
 | `.claude/03-architecture/tech-stack.md` | package.json / requirements.txt | 실제 사용 기술, 버전 |
 | `.claude/05-implementation/conventions.md` | 실제 코드 | 네이밍, 디렉토리 구조, 에러 처리 패턴 |
@@ -40,13 +40,17 @@ metadata:
 ### Step 2: 자동 탐지
 코드를 스캔하여 문서와 대조한다:
 
-**API 드리프트 탐지:**
-1. 라우트 파일에서 엔드포인트 목록 추출
-2. api-spec.md에 정의된 엔드포인트와 비교
+**API 드리프트 탐지** (엔드포인트 존재 한정):
+1. 라우트 파일에서 엔드포인트 목록(URL + Method) 추출
+2. `api-spec.md` §7 "엔드포인트 요약" 표와 비교
 3. 차이 항목 리스트업:
    - 문서에만 있는 엔드포인트 (미구현 또는 문서 과잉)
    - 코드에만 있는 엔드포인트 (문서 미반영)
-   - URL/메서드/파라미터 불일치
+   - URL / 메서드 불일치
+
+> ⚠️ request/response 스키마·파라미터 형태는 *비교 대상이 아니다.*
+> `api-spec.md` 정책상 본문 스키마는 코드(타입 정의 / OpenAPI 어노테이션)를 단일 진실로 둔다.
+> §1~§4 (처리 로직·동기/비동기·인프라 흐름·외부 API 호출) 는 개념적 기록이므로 자동 drift 탐지 대상이 아니며, 사람이 검토한다.
 
 **데이터 모델 드리프트 탐지:**
 1. DB 스키마 또는 ORM 모델에서 테이블/컬럼 추출
