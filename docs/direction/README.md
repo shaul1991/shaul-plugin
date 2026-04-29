@@ -64,6 +64,7 @@
 
 | 날짜 | 주제 | 출시 | 상태 |
 |------|------|------|------|
+| 2026-04-28 | [시크릿 파일 접근 가드레일 헌장](2026-04-28-secret-file-guardrail-charter.md) | v0.7.0 | Active |
 | 2026-04-28 | [사내 3종 문서(용어집·기획요구·기술요구) 통합 관리 헌장](2026-04-28-three-doc-set-charter.md) | v0.6.0 | Active |
 | 2026-04-28 | [사용자 입력 기반 기술 스택 등록·갱신 헌장](2026-04-28-stack-registration-charter.md) | v0.5.0 | Active |
 | 2026-04-28 | [`.claude/` 단일 산출물 위치 및 사용자 결정 추적 헌장](2026-04-28-claude-output-charter.md) | v0.4.0 | Active |
