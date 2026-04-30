@@ -1,0 +1,61 @@
+{
+  "$comment": "Copy this file to <project>/.claude/integrations.json and edit. The plugin's hooks (plane-watch.sh, plane-sync.sh) read it on session start and on every Edit/Write tool call. If the file is absent, the plugin behaves identically to v0.9.0 (local-only). Charter: docs/direction/2026-04-30-plane-integration-charter.md",
+  "$mode_note": "tracker.primary controls whether external sync is active at all. Set it to null (or remove the file) for v0.9.0 bit-identical behavior. Per-domain mode overrides tracker.default_mode. v1 supports modes: 'local' (no push), 'plane' (push, Plane is master semantically), 'both' (push, local is master semantically). v1 push behavior is identical for plane/both — the semantic difference reserves the slot for v0.11+ pull.",
+  "$secret_note": "API token is NEVER stored in this file. It lives at .claude/local/plane.secret.json (gitignored, secret-guard auto-blocks *.secret.json) or in the env vars CLAUDE_PLUGIN_PLANE_TOKEN / PLANE_API_TOKEN. Priority: env > env > file > none(skip).",
+  "schema_version": 1,
+  "tracker": {
+    "primary": "plane",
+    "default_mode": "both"
+  },
+  "providers": {
+    "plane": {
+      "enabled": true,
+      "host": "https://api.plane.so",
+      "api_version": "v1",
+      "workspace_slug": "your-workspace-slug",
+      "project_id": "your-plane-project-uuid",
+      "secret_file": ".claude/local/plane.secret.json",
+      "domains": {
+        "issues": {
+          "mode": "both",
+          "path_glob": "docs/issues/*.md",
+          "plane_resource": "issue",
+          "default_labels": ["from:claude"],
+          "default_state": "Backlog"
+        },
+        "lifecycle": {
+          "mode": "plane",
+          "path": "docs/alm/lifecycle.md",
+          "plane_resource": "module",
+          "module_id": null,
+          "module_name_template": "ALM Lifecycle"
+        },
+        "tech_debt": {
+          "mode": "both",
+          "path": "docs/alm/tech-debt-registry.md",
+          "plane_resource": "issue",
+          "default_labels": ["tech-debt"],
+          "label_by_severity": {
+            "Critical": ["sev:critical"],
+            "High": ["sev:high"],
+            "Medium": ["sev:medium"],
+            "Low": ["sev:low"]
+          }
+        },
+        "execution_plans": {
+          "mode": "both",
+          "path_glob": ".claude/local/plans/*/*/execution-plan.md",
+          "plane_resource": "sub_issue",
+          "parent_resolver": "branch_to_phase_issue",
+          "default_labels": ["execution-plan"]
+        }
+      },
+      "safety": {
+        "fail_open": true,
+        "max_calls_per_session": 200,
+        "dry_run": false,
+        "delete_strategy": "archive"
+      }
+    }
+  }
+}

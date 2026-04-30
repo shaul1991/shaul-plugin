@@ -61,6 +61,8 @@ metadata:
 
 이 절차는 사용자가 Phase 0(`00-setup`)을 건너뛰고 다른 Phase부터 시작했을 때, 또는 SessionStart 훅이 실행되지 않은 환경에서도 작업 영역과 gitignore 보호가 정합 상태로 유지됨을 보장한다.
 
+> **외부 트래커 연동(`/integrations`) 활성 시 (v0.10.0+):** 실행계획서를 작성·갱신하면 PostToolUse 훅(`plane-sync.sh`)이 자동으로 Plane Sub-issue 로 push 한다. governance 스킬은 *외부 트래커에 직접 쓰지 않는다* — 헌장 D7. 별도 액션 불필요.
+
 ### 실행계획서 구조
 
 `references/execution-plan-template.md`의 템플릿을 기반으로 작성:

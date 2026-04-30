@@ -98,3 +98,14 @@
 ---
 
 *기술 부채는 "나중에"라는 약속의 이자를 복리로 지불하게 된다. 기록하고, 추적하고, 정기적으로 상환하라.*
+
+<!-- plane-sync:tech-debt
+{
+  "issues": {}
+}
+plane-sync:end -->
+<!--
+위 HTML 주석 블록은 외부 트래커 연동(/integrations) 활성 시 PostToolUse 훅이
+TD-NNN ↔ Plane Issue 매핑을 자동으로 채운다. 비활성(local 모드)이면 빈 채로 무해하게 남는다.
+헌장: docs/direction/2026-04-30-plane-integration-charter.md.
+-->

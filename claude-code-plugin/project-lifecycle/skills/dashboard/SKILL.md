@@ -61,6 +61,16 @@ Phase | 단계명         | 상태   | 핵심 산출물              | 거버넌
 
 **순차 진행이 권장되지만 필수는 아님.** 사용자가 특정 단계만 필요하다면 해당 단계로 바로 진행.
 
+### Step 3-1: 외부 트래커 연동 표시 (v0.10.0+, read-only)
+
+`<project-root>/.claude/integrations.json` 이 존재하고 `tracker.primary` 가 `null`/`local` 이 아니면, 대시보드 헤더에 한 줄 표시:
+
+```
+외부 트래커: Plane (workspace=<slug>, project=<uuid 끝 8자리>, mode=both)
+```
+
+**read-only 분기.** 본 표시는 헌장 D7 의 예외 — 단순 *읽기*. 동기화 푸시는 PostToolUse 훅이 단독 책임.
+
 ### Step 4: lifecycle.md 관리
 프로젝트 루트에 `.claude/lifecycle.md` 파일을 생성/업데이트하여 ALM 추적 정보를 관리:
 

@@ -1,0 +1,51 @@
+{
+  "name": "project-lifecycle",
+  "version": "0.11.0",
+  "description": "Project lifecycle governance plugin for Codex and Claude Code. Provides phase-based skills for setup, ideation, planning, architecture, design, implementation, infrastructure, QA, maintenance, governance, sync checks, impact analysis, debt collection, knowledge management, and optional tracker integration.",
+  "author": {
+    "name": "SHAUL",
+    "url": "https://github.com/shaul1991"
+  },
+  "homepage": "https://github.com/shaul1991/shaul-plugin",
+  "repository": "https://github.com/shaul1991/shaul-plugin",
+  "keywords": [
+    "project",
+    "lifecycle",
+    "planning",
+    "architecture",
+    "design",
+    "implementation",
+    "qa",
+    "infra",
+    "alm",
+    "governance",
+    "codex",
+    "claude-code",
+    "dual-runtime",
+    "primary-runtime",
+    "parallel-review",
+    "tracker-integration",
+    "plane"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Lifecycle",
+    "shortDescription": "Plan, govern, and review project lifecycle work",
+    "longDescription": "Use Project Lifecycle to guide work through setup, ideation, planning, architecture, design, implementation, infrastructure, QA, maintenance, and cross-cutting governance workflows. The same plugin source can be installed in Claude Code or Codex, with the installing tool acting as the primary runtime and the other tool available as an optional reviewer.",
+    "developerName": "SHAUL",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/shaul1991/shaul-plugin",
+    "defaultPrompt": [
+      "프로젝트 초기 설정을 시작해줘",
+      "실행 계획을 세우고 검토해줘",
+      "프로젝트 현황과 다음 단계를 보여줘"
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}
