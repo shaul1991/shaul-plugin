@@ -1,6 +1,6 @@
 # shaul-plugin
 
-> **project-lifecycle** — Claude Code로 프로젝트 전 수명주기를 단계별로 가이드하는 플러그인.
+> **project-lifecycle** — Claude Code와 Codex에서 프로젝트 전 수명주기를 단계별로 가이드하는 플러그인.
 
 즉흥 코딩의 비용을 줄이고, 모든 작업을 **계획 → 검증 → 실행 → 재검증**의 거버넌스로 통과시킵니다. 모든 산출물은 `.claude/` 하위에 단계별로 정리되며 `.claude/`는 기본적으로 git 추적에서 제외됩니다. 공유가 필요한 산출물은 사용자가 `.claude/` 밖(예: `docs/`)으로 직접 옮길 때만 추적되는 **사용자 결정 추적** 구조입니다.
 
@@ -16,6 +16,7 @@
 - **시크릿 파일 가드 (v0.7.0)** — `Read`/`Edit`/`Write`/`Bash` 가 `.env`, `.env.*` 같은 시크릿 파일을 만지려 시도하면 *무조건* 차단(또는 사용자 확인 프롬프트). 어느 step·skill·에이전트에서도 동일 적용. 사용자가 `.claude/secret-guard.json` 한 파일만 편집해 정책을 추가·삭제 가능. 일시 해제는 `CLAUDE_PLUGIN_SECRET_GUARD` 환경변수에 `off`/`0`/`false`/`no` 중 하나(대소문자 무관) 설정. python3 부재·정책 평가 불가 시에는 *fail-closed*(기본 차단)로 동작.
 - **자산 위치 정리 (v0.9.0)** — `00-setup` Step 8 에서 *.claude/ = Claude/플러그인 사용 설정 전용*(`CLAUDE.md`·`secret-guard.json`·`settings.json`), *모든 문서는 `docs/`* 의 의미별 하위 폴더로(architecture·operations·team·policies·alm·issues·knowledge), 로컬은 `.claude/local/` 차단 권유. v0.8.0 의 symlink 패턴은 폐기되어 macOS/Linux/Windows 환경 비종속. 자동 이동은 *하지 않으며* 사용자 명시 결정 후 명령 시퀀스 제시. v0.7.x 이전·v0.8.x 모두 하위 호환 보장.
 - **외부 트래커 옵션 통합 (v0.10.0)** — `.claude/integrations.json` 한 파일로 [Plane Opensource](https://plane.so/) 연동을 켜고 끔. 모드 3종: `local`(default, v0.9.0 비트단위 동일) / `plane` / `both`. 활성 시 PostToolUse 훅이 4개 도메인(`docs/issues/`·`docs/alm/lifecycle.md`·`docs/alm/tech-debt-registry.md`·`.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`)을 자동 push. 토큰은 `.claude/local/plane.secret.json` (gitignore 차단 + secret-guard `*.secret.json` 자동 차단 이중 보호) 또는 `CLAUDE_PLUGIN_PLANE_TOKEN`/`PLANE_API_TOKEN` 환경변수. *Fail-open* — 네트워크 실패·5xx 는 stderr 경고만, 사용자 작업은 블록되지 않음. 활성 절차는 `/integrations` 스킬 안내. 자세한 내용은 헌장 `docs/direction/2026-04-30-plane-integration-charter.md`.
+- **Claude Code / Codex dual-runtime 설치 (v0.11.0)** — 설치 적용 스크립트에서 `--primary claude|codex` 를 명시합니다. 설치한 쪽이 주 사용 도구(primary)가 되고, `--with-secondary` 로 반대 도구를 optional reviewer 로 marketplace 등록할 수 있습니다.
 - **16개 스킬 + 15개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper`, `knowledge` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
 - **ALM 추적성** — `.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`로 요구사항·설계·코드·테스트·KPI의 연결을 관리. (공유가 필요하면 사용자가 직접 추적 영역으로 이동)
 
@@ -23,7 +24,8 @@
 
 ## 요구사항
 
-- Claude Code (플러그인을 로드할 수 있는 환경)
+- Claude Code 또는 Codex CLI (선택한 primary runtime)
+- secondary reviewer 를 함께 등록하려면 반대쪽 CLI도 설치되어 있어야 합니다
 - `git` (브랜치 인식 및 SessionStart 부트스트랩 가드용)
 - `bash` (SessionStart 훅 스크립트용)
 
@@ -31,7 +33,47 @@
 
 ## 설치
 
-### 방법 1. 마켓플레이스에서 설치 (권장)
+### 방법 0. 설치 적용 스크립트 (권장)
+
+플러그인을 설치할 도구가 곧 primary runtime 입니다. Claude Code를 주 사용으로
+둘지, Codex를 주 사용으로 둘지 명시합니다.
+
+```bash
+# Claude Code primary, Codex optional secondary
+./scripts/install-project-lifecycle.sh \
+  --primary claude \
+  --project /path/to/your-project \
+  --with-secondary
+
+# Codex primary, Claude Code optional secondary
+./scripts/install-project-lifecycle.sh \
+  --primary codex \
+  --project /path/to/your-project \
+  --with-secondary
+```
+
+기본 설치 소스는 현재 저장소입니다. GitHub marketplace 소스로 등록하려면:
+
+```bash
+./scripts/install-project-lifecycle.sh \
+  --primary claude \
+  --project /path/to/your-project \
+  --source shaul1991/shaul-plugin
+```
+
+설치 위치:
+
+| primary | runtime config | local workspace |
+|---------|----------------|-----------------|
+| Claude Code | `<project>/.claude/project-lifecycle.json` | `.claude/local/...` |
+| Codex | `<project>/.codex/project-lifecycle.json` | `.codex/local/...` |
+
+Claude Code primary 는 스크립트가 `claude plugin install` 까지 실행합니다.
+Codex CLI 는 현재 marketplace 관리 명령만 제공하므로, Codex primary 는
+스크립트 실행 후 Codex에서 `/plugins` 를 열어 `shaul-plugin` →
+`project-lifecycle` 을 설치합니다.
+
+### 방법 1. Claude Code 마켓플레이스에서 수동 설치
 
 이 저장소 자체가 Claude Code 플러그인 마켓플레이스로 동작합니다
 (`.claude-plugin/marketplace.json` 보유). Claude Code 세션에서 다음을 실행합니다:
@@ -54,6 +96,14 @@
 ```text
 /plugin marketplace add /path/to/shaul-plugin
 /plugin install project-lifecycle@shaul-plugin
+```
+
+Codex에서 로컬 marketplace 를 등록하려면:
+
+```bash
+codex plugin marketplace add /path/to/shaul-plugin
+codex
+# /plugins → shaul-plugin → project-lifecycle → Install plugin
 ```
 
 설치 직후 새 세션을 한 번 시작하면, 현재 작업 중인 git 저장소에 다음이 자동으로 만들어집니다:
@@ -88,12 +138,15 @@
 shaul-plugin/
 ├── README.md                                 ← 이 파일 (랜딩 페이지)
 ├── CHANGELOG.md                              ← 버전별 변경 이력
+├── scripts/
+│   └── install-project-lifecycle.sh          ← Claude/Codex primary 선택 설치 적용
 ├── .claude-plugin/
 │   └── marketplace.json                      ← 마켓플레이스 매니페스트 (이 저장소를 마켓으로 노출)
 └── claude-code-plugin/
     └── project-lifecycle/
         ├── README.md                         ← 상세 매뉴얼 (스킬·에이전트 카탈로그)
         ├── .claude-plugin/plugin.json
+        ├── .codex-plugin/plugin.json
         ├── hooks/                            ← SessionStart/PreToolUse/PostToolUse 훅 + lib/
         ├── agents/                           ← 15개 전문가 에이전트 정의
         └── skills/                           ← 17개 스킬 정의 (Phase + 크로스커팅 + integrations)
@@ -117,6 +170,6 @@ shaul-plugin/
 - 브랜치 네이밍은 `claude/<주제>` 또는 `feature/<주제>` 컨벤션을 따릅니다.
 - 작업 중 작성되는 실행계획은 자동으로 `.claude/local/plans/<branch>/...`에 저장되며 `.claude/` 폴더 전체 ignore의 일부로 git 추적에서 제외됩니다. 합의가 끝난 계획·산출물 중 팀과 공유가 필요한 것만 사용자가 직접 `.claude/` 밖(예: `docs/`)으로 이동시켜 추적 영역에 둡니다.
 - 사용자(저장소 오너)로부터 **플러그인 개발 방향성·요구사항·아키텍처 결정**을 새로 받았다면, 그 내용은 `docs/direction/`에 영구 기록을 남깁니다 (컨벤션은 [`docs/direction/README.md`](docs/direction/README.md) 참조). 구현 결과는 출시·CHANGELOG로, *왜 그렇게 만들었는가*는 이 디렉토리로 분리해 기록합니다.
-- `claude-code-plugin/project-lifecycle/` 하위(스킬·에이전트·훅·`plugin.json`)를 수정하면 마켓플레이스 매니페스트(`.claude-plugin/marketplace.json`)의 `version` 및 해당 plugin entry의 `version`을 함께 갱신합니다.
+- `claude-code-plugin/project-lifecycle/` 하위(스킬·에이전트·훅·`plugin.json`·`.codex-plugin/plugin.json`)를 수정하면 마켓플레이스 매니페스트(`.claude-plugin/marketplace.json`)의 `version` 및 해당 plugin entry의 `version`을 함께 갱신합니다.
 - 사용자에게 영향을 주는 변경은 `CHANGELOG.md`에 항목을 추가합니다(Keep a Changelog 형식, SemVer).
 - PR을 올리기 전 `governance` 스킬의 재검증 체크리스트를 먼저 통과시키는 것을 권장합니다.

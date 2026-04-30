@@ -1,8 +1,24 @@
 # Project Lifecycle Plugin
 
-프로젝트 전체 라이프사이클을 단계별로 가이드하는 Claude Code 플러그인.
+프로젝트 전체 라이프사이클을 단계별로 가이드하는 Claude Code / Codex dual-runtime 플러그인.
 
 초기 설정부터 아이디어 수집, 기획, 설계, 디자인, 구현, 인프라, QA, 운영/회고까지 — 각 단계의 베스트 프랙티스와 템플릿을 제공하며, ALM(Application Lifecycle Management) 관점에서 추적성과 거버넌스를 관리합니다.
+
+## Dual-runtime 설치
+
+저장소 루트에서 설치 적용 스크립트를 실행해 primary runtime 을 명시합니다.
+
+```bash
+# Claude Code primary, Codex optional secondary
+./scripts/install-project-lifecycle.sh --primary claude --project /path/to/project --with-secondary
+
+# Codex primary, Claude Code optional secondary
+./scripts/install-project-lifecycle.sh --primary codex --project /path/to/project --with-secondary
+```
+
+- Claude Code primary 는 `.claude/project-lifecycle.json` 을 쓰고 `claude plugin install` 까지 수행합니다.
+- Codex primary 는 `.codex/project-lifecycle.json` 을 쓰고 `codex plugin marketplace add` 를 수행합니다. 이후 Codex에서 `/plugins` 를 열어 `shaul-plugin` → `project-lifecycle` 을 설치합니다.
+- `--with-secondary` 는 반대 도구를 optional reviewer 로 marketplace 등록합니다. 최종 검토·비교·병합 결정은 primary runtime 이 소유합니다.
 
 ## 플로우 개요
 

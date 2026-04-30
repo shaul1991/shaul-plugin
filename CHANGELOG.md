@@ -6,6 +6,28 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-04-30
+
+### Added — Claude Code / Codex dual-runtime install
+- **Codex manifest 추가**: `claude-code-plugin/project-lifecycle/.codex-plugin/plugin.json`.
+  같은 플러그인 루트를 Claude Code 와 Codex 양쪽에서 설치할 수 있도록
+  Codex용 manifest/interface metadata 를 추가했다.
+- **설치 적용 스크립트 추가**: `scripts/install-project-lifecycle.sh`.
+  `--primary claude|codex`, `--project <path>`, `--with-secondary`,
+  `--source <path-or-repo>`, `--dry-run` 을 지원한다.
+- **primary runtime config**:
+  - Claude primary → `<project>/.claude/project-lifecycle.json`
+  - Codex primary → `<project>/.codex/project-lifecycle.json`
+  - `--with-secondary` 는 반대 도구를 optional reviewer 로 marketplace 등록한다.
+- **dual-runtime 헌장 추가**:
+  `docs/direction/2026-04-30-dual-runtime-install-charter.md`.
+
+### Changed
+- README 설치 절차를 Claude Code primary / Codex primary / optional secondary
+  구조로 갱신했다.
+- marketplace/plugin manifest 버전을 `0.11.0` 으로 동기화하고 dual-runtime
+  keywords 를 추가했다.
+
 ## [0.10.0] — 2026-04-30
 
 ### Added — 외부 트래커 옵션 통합 (Plane Opensource)
