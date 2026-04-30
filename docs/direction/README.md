@@ -64,6 +64,8 @@
 
 | 날짜 | 주제 | 출시 | 상태 |
 |------|------|------|------|
+| 2026-04-29 | [`.claude/` = 사용 설정 전용, 모든 문서는 `docs/` 로 헌장](2026-04-29-claude-as-settings-only-charter.md) | v0.9.0 | Active |
+| 2026-04-29 | [사내 자산 3계층(공유 · 운영 · 로컬) 분류 헌장](2026-04-29-three-tier-asset-charter.md) | v0.8.0 | Superseded by 2026-04-29-claude-as-settings-only-charter |
 | 2026-04-28 | [시크릿 파일 접근 가드레일 헌장](2026-04-28-secret-file-guardrail-charter.md) | v0.7.0 | Active |
 | 2026-04-28 | [사내 3종 문서(용어집·기획요구·기술요구) 통합 관리 헌장](2026-04-28-three-doc-set-charter.md) | v0.6.0 | Active |
 | 2026-04-28 | [사용자 입력 기반 기술 스택 등록·갱신 헌장](2026-04-28-stack-registration-charter.md) | v0.5.0 | Active |
