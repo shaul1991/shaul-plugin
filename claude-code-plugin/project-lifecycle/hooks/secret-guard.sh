@@ -71,7 +71,7 @@ import sys, json, os, fnmatch, re
 
 DEFAULTS = {
     "schema_version": 1,
-    "always_block": [".env", ".env.*"],
+    "always_block": [".env", ".env.*", "*.secret.json", "plane.secret.json"],
     "ask_before_read": [],
     "exempt_suffixes": [".example", ".sample", ".template", ".dist"],
 }

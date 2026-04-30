@@ -1,12 +1,12 @@
 {
   "name": "project-lifecycle",
-  "version": "0.9.0",
-  "description": "프로젝트 전체 라이프사이클을 단계별로 가이드하는 플러그인. 초기 설정부터 아이디어 수집, 기획, 설계, 디자인, 구현, 인프라, QA, 운영/회고까지 각 단계의 베스트 프랙티스와 템플릿을 제공하며, Plan-Review-Execute-Reverify 거버넌스와 ALM 관점의 추적성을 관리합니다. 03-architecture 단계에서 사용자 입력 기반의 다중 프로젝트 기술 스택 등록(.claude/local/stack.json), knowledge 스킬에서 사내 3종 문서(용어집·기획요구·기술요구) 통합 관리(docs/knowledge/), PreToolUse 시크릿 파일 가드(.env/.env.* 기본 차단, .claude/secret-guard.json 사용자 정책), v0.9.0 부터 00-setup Step 8 에서 자산 위치 정리 권유 — .claude/ = Claude/플러그인 사용 설정 전용(CLAUDE.md, secret-guard.json, settings.json), 모든 문서는 docs/ 의 의미별 하위 폴더로(architecture, operations, team, policies, alm, issues, knowledge), 로컬은 .claude/local/ 차단. 모든 영역에서 SessionStart/PreToolUse 훅이 자동 동작합니다(자동 갱신 X). 신규 도메인 연락관(domain-liaison) 에이전트가 팀별·도메인 간 vocabulary 일관성을 책임집니다.",
+  "version": "0.10.0",
+  "description": "프로젝트 전체 라이프사이클을 단계별로 가이드하는 플러그인. 초기 설정부터 아이디어 수집, 기획, 설계, 디자인, 구현, 인프라, QA, 운영/회고까지 각 단계의 베스트 프랙티스와 템플릿을 제공하며, Plan-Review-Execute-Reverify 거버넌스와 ALM 관점의 추적성을 관리합니다. 03-architecture 단계에서 사용자 입력 기반의 다중 프로젝트 기술 스택 등록(.claude/local/stack.json), knowledge 스킬에서 사내 3종 문서(용어집·기획요구·기술요구) 통합 관리(docs/knowledge/), PreToolUse 시크릿 파일 가드(.env/.env.*/*.secret.json 기본 차단, .claude/secret-guard.json 사용자 정책), v0.9.0 부터 00-setup Step 8 에서 자산 위치 정리 권유 — .claude/ = Claude/플러그인 사용 설정 전용(CLAUDE.md, secret-guard.json, settings.json, integrations.json), 모든 문서는 docs/ 의 의미별 하위 폴더로(architecture, operations, team, policies, alm, issues, knowledge), 로컬은 .claude/local/ 차단. v0.10.0 부터 외부 트래커(Plane Opensource) 옵션 통합 — .claude/integrations.json 한 파일로 local(default)/plane/both 모드 전환, PostToolUse 훅이 4개 도메인(docs/issues/, docs/alm/lifecycle.md, docs/alm/tech-debt-registry.md, .claude/local/plans/<branch>/<NN-phase>/execution-plan.md) 을 자동 push, 토큰은 .claude/local/plane.secret.json + secret-guard 이중 차단. 모든 영역에서 SessionStart/PreToolUse/PostToolUse 훅이 자동 동작합니다(자동 갱신 X, fail-open). 신규 도메인 연락관(domain-liaison) 에이전트가 팀별·도메인 간 vocabulary 일관성을 책임집니다.",
   "author": {
     "name": "SHAUL",
     "url": "https://github.com/shaul1991"
   },
   "homepage": "https://github.com/shaul1991/shaul-plugin",
   "repository": "https://github.com/shaul1991/shaul-plugin",
-  "keywords": ["project", "lifecycle", "planning", "architecture", "design", "implementation", "qa", "infra", "alm", "governance", "setup", "maintenance", "sync-check", "impact-analysis", "debt-collector", "gate-keeper", "tech-stack", "monorepo", "knowledge", "glossary", "domain-liaison", "onboarding", "agents-md", "security", "secret-guard", "pretooluse", "dotenv", "asset-location", "config-vs-docs", "claude-as-settings"]
+  "keywords": ["project", "lifecycle", "planning", "architecture", "design", "implementation", "qa", "infra", "alm", "governance", "setup", "maintenance", "sync-check", "impact-analysis", "debt-collector", "gate-keeper", "tech-stack", "monorepo", "knowledge", "glossary", "domain-liaison", "onboarding", "agents-md", "security", "secret-guard", "pretooluse", "posttooluse", "dotenv", "asset-location", "config-vs-docs", "claude-as-settings", "tracker-integration", "plane", "plane-opensource", "integrations-json", "external-tracker", "issue-sync"]
 }

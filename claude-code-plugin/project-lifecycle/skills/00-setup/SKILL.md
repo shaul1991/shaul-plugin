@@ -226,6 +226,21 @@ find docs -type f -name "*.md" -exec sed -i '' \
 
 > "이제 `docs/` 가 *모든 문서의 단일 진입점* 입니다. 신규 합류자는 `docs/` 만 보면 충분합니다. `.claude/` 는 Claude/플러그인 작동 설정만 두므로 *팀이 직접 편집* 하는 일은 거의 없습니다 (`secret-guard.json` 정책 추가 같은 예외 케이스 외)."
 
+### Step 9: 외부 트래커 연동 권유 (v0.10.0+, 사용자 결정, 옵션)
+
+> 자동 활성화하지 않는다. 단지 *권유*만 한다. 헌장 D11 — `integrations.json`·`plane.secret.json` 은 사용자가 *직접* 작성. 헌장 `2026-04-30-plane-integration-charter.md` 참조.
+
+사용자에게 *반드시 한 번* 알린다:
+
+> "본 플러그인은 `docs/issues/`, `docs/alm/lifecycle.md`, `docs/alm/tech-debt-registry.md`,
+> `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md` 4개 작업 자산을 외부 트래커
+> (v0.10.0: **Plane Opensource**) 와 자동 동기화할 수 있습니다. 옵션입니다 — 기본은 `local`
+> 모드로 v0.9.0 동작과 비트단위 동일합니다.
+>
+> 필요하다면 `/integrations` 스킬이 활성 절차(설정 파일 작성, 토큰 등록, DRY-RUN 검증) 를 안내합니다."
+
+활성을 원치 않는 경우, 어떤 액션도 필요 없다 — 본 단계는 *권유* 로 종료.
+
 ## 가이드라인
 
 - Phase 0은 다른 모든 Phase의 전제 조건이다 — 반드시 먼저 수행

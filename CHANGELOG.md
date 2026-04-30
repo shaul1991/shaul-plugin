@@ -6,6 +6,84 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-04-30
+
+### Added — 외부 트래커 옵션 통합 (Plane Opensource)
+- **`.claude/integrations.json` 한 파일로 외부 트래커 활성·비활성**.
+  `tracker.primary` = `null`(or 파일 부재) → v0.9.0 비트단위 동일 (기존
+  사용자 영향 0). `"plane"` 으로 설정 시 4개 도메인 자동 push.
+- **연동 4개 도메인** (provider 안에서 도메인별 `mode` 상속/오버라이드):
+  - `docs/issues/<slug>.md` ↔ Plane Issue (root) — frontmatter 매핑
+  - `docs/alm/lifecycle.md` ↔ Plane Module + Module Issue per Phase —
+    file-end `<!-- plane-sync:lifecycle ... -->` 주석 블록 매핑
+  - `docs/alm/tech-debt-registry.md` ↔ Plane Issue per `TD-NNN`
+    (label=`tech-debt` + severity) — file-end 주석 블록 매핑
+  - `.claude/local/plans/<branch>/<NN-phase>/execution-plan.md` ↔ Plane
+    Sub-issue (parent = lifecycle Phase Issue) — frontmatter 매핑
+- **모드 3종**: `local` (default, 동기화 X) / `plane` (Plane 마스터) /
+  `both` (local 마스터). v1 push 동작은 `plane`/`both` 동일 — 의미적
+  분리는 v0.11+ pull 기능 슬롯.
+- **Fail-open 정책** (secret-guard fail-closed 와 의도적 대비). 네트워크
+  실패·5xx·토큰 부재 모두 stderr 경고 + skip — 사용자 작업은 *블록되지
+  않는다*. 401(잘못된 토큰)은 명확 메시지로 sync 비활성.
+- **신규 훅 / 라이브러리**:
+  - `hooks/plane-watch.sh` (SessionStart, read-only 상태 보고)
+  - `hooks/plane-sync.sh` (PostToolUse `Edit|Write`, 자동 push)
+  - `hooks/lib/plane_sync.py` (config 파싱·HTTP·frontmatter·도메인 sync 의 단일 두뇌)
+- **신규 템플릿**:
+  - `hooks/integrations-template.json` — `.claude/integrations.json` 시작 샘플
+  - `hooks/plane-secret-template.json` — `.claude/local/plane.secret.json` 시작 샘플
+- **신규 스킬** `/integrations` — 외부 트래커 활성 절차·상태 점검·트러블슈팅 안내.
+  자동 push 는 *훅 책임*, 본 스킬은 read-only 가이드 (헌장 D7).
+- **신규 헌장** `docs/direction/2026-04-30-plane-integration-charter.md`
+  — 본 통합의 사용자 원문·5 원칙·D1~D16 결정·미래 12 가드레일·도메인 매핑·모드 동작.
+- **토큰 우선순위**: `CLAUDE_PLUGIN_PLANE_TOKEN` (env) > `PLANE_API_TOKEN`
+  (env) > `.claude/local/plane.secret.json` (파일) > 없음 (skip).
+- **세션 단위 일시 비활성**: `CLAUDE_PLUGIN_PLANE_SYNC=off|0|false|no`.
+
+### Changed
+- **`hooks/hooks.json`** — `SessionStart` 에 `plane-watch.sh` 추가,
+  **`PostToolUse` 매처 신설** (`Edit|Write` → `plane-sync.sh`).
+- **`hooks/secret-guard-template.json`** + **`hooks/secret-guard.sh`
+  내장 DEFAULTS** — `always_block` 에 `*.secret.json`, `plane.secret.json`
+  추가. `.claude/local/plane.secret.json` 이 자동 차단됨 (basename 매칭).
+  헌장 D14: v0.7.0 헌장 D7 ("기본값 확장은 헌장 갱신 후") 절차에 따른 추가.
+- **`00-setup` SKILL Step 9 신설** — "외부 트래커 연동 권유 (옵션)".
+  자동 활성화 X, 사용자가 원할 때 `/integrations` 안내.
+- **`dashboard` SKILL Step 3-1** — 활성 트래커 한 줄 표시 (read-only 분기).
+- **`governance` SKILL** — "PLAN 사전 준비" 절에 한 줄 추가: 외부 트래커
+  활성 시 PostToolUse 가 자동 push, governance 는 직접 쓰지 않음 (D7).
+- **`debt-collector` SKILL Step 4 끝** — 신규 `TD-NNN` 자동 push 안내.
+- **`03-architecture` references/tech-debt-registry-template.md** — 파일
+  끝에 `<!-- plane-sync:tech-debt -->` 빈 블록 자리 (옵션, 비활성 시 무해).
+- 플러그인 description / keywords 에 `tracker-integration`, `plane`,
+  `plane-opensource`, `integrations-json`, `external-tracker`, `issue-sync`,
+  `posttooluse` 추가.
+
+### Migration (v0.9.0 → v0.10.0)
+**기본은 무액션.** v0.10.0 으로 업그레이드해도 `.claude/integrations.json`
+을 만들지 않는 한 v0.9.0 동작과 비트단위 동일 (헌장 D1).
+
+외부 트래커를 켜고 싶다면 `/integrations` 스킬을 호출하거나 다음 절차를
+*사용자 명시적으로* 진행:
+
+```bash
+# 1. 비-시크릿 통합 설정
+cp "${CLAUDE_PLUGIN_ROOT}/hooks/integrations-template.json" .claude/integrations.json
+# → workspace_slug, project_id, host 를 직접 편집
+
+# 2. 시크릿 토큰 (gitignore 차단 영역)
+mkdir -p .claude/local
+cp "${CLAUDE_PLUGIN_ROOT}/hooks/plane-secret-template.json" .claude/local/plane.secret.json
+chmod 600 .claude/local/plane.secret.json
+# → api_token, issued_at 직접 편집
+
+# 3. 첫 세션은 dry_run: true 권장 (헌장 D16) — stderr 로 어떤 push 가 일어날지 확인
+```
+
+자세한 절차·트러블슈팅은 `claude-code-plugin/project-lifecycle/skills/integrations/SKILL.md`
+참조.
+
 ## [0.9.0] — 2026-04-29
 
 ### Changed — Asset Classification 재정의 (BREAKING for v0.8.x adopters)

@@ -15,6 +15,7 @@
 - **사내 3종 문서 통합 관리 (v0.6.0)** — 신규 `knowledge` 스킬이 용어집·기획요구·기술요구를 인덱스(lazy-load) 한 묶음으로 관리합니다. 다른 AI 도구(Cursor·Codex·Copilot·Gemini 등) 도달이 필요하면 사용자가 인덱스를 루트 `AGENTS.md` 로 *수동 승격*(이동·심링크). 신규 `domain-liaison` 에이전트가 팀별·도메인 간 vocabulary 일관성을 책임집니다.
 - **시크릿 파일 가드 (v0.7.0)** — `Read`/`Edit`/`Write`/`Bash` 가 `.env`, `.env.*` 같은 시크릿 파일을 만지려 시도하면 *무조건* 차단(또는 사용자 확인 프롬프트). 어느 step·skill·에이전트에서도 동일 적용. 사용자가 `.claude/secret-guard.json` 한 파일만 편집해 정책을 추가·삭제 가능. 일시 해제는 `CLAUDE_PLUGIN_SECRET_GUARD` 환경변수에 `off`/`0`/`false`/`no` 중 하나(대소문자 무관) 설정. python3 부재·정책 평가 불가 시에는 *fail-closed*(기본 차단)로 동작.
 - **자산 위치 정리 (v0.9.0)** — `00-setup` Step 8 에서 *.claude/ = Claude/플러그인 사용 설정 전용*(`CLAUDE.md`·`secret-guard.json`·`settings.json`), *모든 문서는 `docs/`* 의 의미별 하위 폴더로(architecture·operations·team·policies·alm·issues·knowledge), 로컬은 `.claude/local/` 차단 권유. v0.8.0 의 symlink 패턴은 폐기되어 macOS/Linux/Windows 환경 비종속. 자동 이동은 *하지 않으며* 사용자 명시 결정 후 명령 시퀀스 제시. v0.7.x 이전·v0.8.x 모두 하위 호환 보장.
+- **외부 트래커 옵션 통합 (v0.10.0)** — `.claude/integrations.json` 한 파일로 [Plane Opensource](https://plane.so/) 연동을 켜고 끔. 모드 3종: `local`(default, v0.9.0 비트단위 동일) / `plane` / `both`. 활성 시 PostToolUse 훅이 4개 도메인(`docs/issues/`·`docs/alm/lifecycle.md`·`docs/alm/tech-debt-registry.md`·`.claude/local/plans/<branch>/<NN-phase>/execution-plan.md`)을 자동 push. 토큰은 `.claude/local/plane.secret.json` (gitignore 차단 + secret-guard `*.secret.json` 자동 차단 이중 보호) 또는 `CLAUDE_PLUGIN_PLANE_TOKEN`/`PLANE_API_TOKEN` 환경변수. *Fail-open* — 네트워크 실패·5xx 는 stderr 경고만, 사용자 작업은 블록되지 않음. 활성 절차는 `/integrations` 스킬 안내. 자세한 내용은 헌장 `docs/direction/2026-04-30-plane-integration-charter.md`.
 - **16개 스킬 + 15개 전문가 에이전트** — Phase별 스킬 외에 `dashboard`, `governance`, `sync-check`, `impact-analysis`, `debt-collector`, `gate-keeper`, `knowledge` 같은 크로스커팅 유틸리티와 시니어 페르소나를 가진 에이전트가 함께 동작합니다.
 - **ALM 추적성** — `.claude/lifecycle.md`, `.claude/tech-debt-registry.md`, `.claude/kpi-definitions.md`로 요구사항·설계·코드·테스트·KPI의 연결을 관리. (공유가 필요하면 사용자가 직접 추적 영역으로 이동)
 
@@ -93,9 +94,9 @@ shaul-plugin/
     └── project-lifecycle/
         ├── README.md                         ← 상세 매뉴얼 (스킬·에이전트 카탈로그)
         ├── .claude-plugin/plugin.json
-        ├── hooks/                            ← SessionStart 부트스트랩 스크립트
-        ├── agents/                           ← 14개 전문가 에이전트 정의
-        └── skills/                           ← 15개 스킬 정의 (Phase + 크로스커팅)
+        ├── hooks/                            ← SessionStart/PreToolUse/PostToolUse 훅 + lib/
+        ├── agents/                           ← 15개 전문가 에이전트 정의
+        └── skills/                           ← 17개 스킬 정의 (Phase + 크로스커팅 + integrations)
 ```
 
 ---
